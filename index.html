@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Sidebar Site</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --hover: #333;
+      --active: #333;
+      --active-hover: #4d4d4d;
+      --button-bg: #1a1a1a;
+      --button-hover: #2a2a2d;
+      --font-color: #fff;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--font-color);
+    }
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 100%;
+      background: var(--bg);
+      padding: 10px;
+      z-index: 100;
+    }
+    .sidebar a {
+      display: block;
+      color: var(--font-color);
+      text-decoration: none;
+      padding: 10px 15px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+      font-size: 20px;
+      background: var(--bg);
+      transition: background 0.3s;
+    }
+    .sidebar a:hover {
+      background: var(--hover);
+    }
+    .sidebar a.active {
+      background: var(--active);
+      font-weight: bold;
+    }
+    .sidebar a.active:hover {
+      background: var(--active-hover);
+    }
+    /* Search Container */
+    .search-container {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .search-container input {
+      width: calc(100% - 45px);
+      padding: 5px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      font-size: 16px;
+      background: #303030;
+      color: var(--font-color);
+    }
+    .search-container button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--button-bg);
+      border-radius: 50%;
+      cursor: pointer;
+      margin-left: 5px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-container button svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--font-color);
+    }
+    /* Content */
+    .content {
+      margin-left: 200px;
+      padding: 20px;
+      background: var(--bg);
+    }
+    /* Burger Menu */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      background: var(--bg);
+      color: var(--font-color);
+      border: none;
+      padding: 10px;
+      z-index: 200;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      .sidebar {
+        left: -200px;
+        transition: left 0.3s;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .content {
+        margin-left: 0;
+        transition: margin-left 0.3s;
+      }
+      .content.shift {
+        margin-left: 200px;
+      }
+    }
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 40px;
+    }
+    .grid a,
+    .grid div {
+      display: block;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--bg);
+      aspect-ratio: 16/9;
+      position: relative;
+    }
+    .grid img {
+      width: calc(100% - 4px);
+      height: calc(100% - 4px);
+      object-fit: cover;
+      margin: 2px;
+      border-radius: 8px;
+      background: var(--bg);
+    }
+    /* Tooltip (hidden by default) */
+    .thumb {
+      position: relative;
+      display: inline-block;
+    }
+    .thumb .desc {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--font-color);
+      font-size: 18px;
+      padding: 10px;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .thumb:hover .desc {
+      display: flex;
+    }
+    /* Contact Form */
+    .contact-form {
+      margin-top: 40px;
+      width: 50%;
+    }
+    .contact-form label {
+      display: block;
+      margin: 10px 0;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      padding: 2px;
+      background: #303030;
+      border: 1px solid #444;
+      color: var(--font-color);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+    .contact-form input[type="email"],
+    .contact-form input[type="text"] {
+      width: 50%;
+    }
+    .contact-form textarea {
+      width: 100%;
+      height: 160px;
+    }
+    .contact-form button {
+      background: var(--button-bg);
+      color: var(--font-color);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-size: 16px;
+    }
+    .contact-form button:hover {
+      background: var(--button-hover);
+    }
+    /* Back-to-Top Button */
+    #backToTop {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: var(--font-color);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+      z-index: 200;
+    }
+    #backToTop:hover {
+      background: #555;
+    }
+    .arrow-up {
+      display: inline-block;
+      transform: rotate(-90deg);
+    }
+    /* Photography Modal */
+    #photoModal {
+      display: none;
+      position: fixed;
+      z-index: 300;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    #photoModal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 4px;
+    }
+    #photoModal .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: var(--font-color);
+      cursor: pointer;
+      z-index: 310;
+    }
+    /* Category Titles */
+    .category-title {
+      font-size: 1.5em;
+      margin: 0;
+    }
+    /* Photography thumbnails clickable */
+    .grid .photo {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Burger Menu & Back-to-Top Button -->
+  <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+  <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
+  
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="#" id="home-link" onclick="return loadContent('home', this);">Home</a>
+    <a href="#" onclick="return loadContent('toppicks', this);">Top Picks</a>
+    <a href="#" onclick="return loadContent('youtube', this);">YouTube</a>
+    <a href="#" onclick="return loadContent('music', this);">Music</a>
+    <a href="#" onclick="return loadContent('videogames', this);">Video Games</a>
+    <a href="#" onclick="return loadContent('books', this);">Books</a>
+    <a href="#" onclick="return loadContent('services', this);">Services</a>
+    <a href="#" onclick="return loadContent('photography', this);">Photography</a>
+    <a href="#" onclick="return loadContent('contact', this);">Contact</a>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search...">
+      <button onclick="doSearch()">
+        <svg viewBox="0 0 512 512">
+          <path d="M505 442.7l-99.7-99.7C429.6 305.8 440 274.6 440 240 440 107.3 332.7 0 200 0S-40 107.3-40 240s107.3 240 240 240c34.6 0 65.8-10.4 103-34.7l99.7 99.7c4.5 4.5 10.6 6.8 16.7 6.8s12.2-2.3 16.7-6.8c9.4-9.4 9.4-24.6 0-34zM200 368c-70.7 0-128-57.3-128-128S129.3 112 200 112s128 57.3 128 128-57.3 128-128 128z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Main Content Area -->
+  <div class="content" id="main-content">
+    <h4 class="category-title">Welcome</h4>
+    <p>Select a category from the sidebar.</p>
+  </div>
+  
+  <!-- Photography Modal Popup -->
+  <div id="photoModal" onclick="if(event.target === this){ closeModal(); }">
+    <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
+    <img src="" alt="Full Size">
+  </div>
+  
+  <script>
+    // Show or hide the back-to-top button
+    window.onscroll = function() {
+      document.getElementById("backToTop").style.display =
+        (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
+    };
+    
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    
+    // Returns display title for a category
+    function getDisplayTitle(cat) {
+      if (cat === "toppicks") return "Top Picks";
+      if (cat === "videogames") return "Video Games";
+      return cat.charAt(0).toUpperCase() + cat.slice(1);
+    }
+    
+    // Extra items arrays for categories
+    const extraToppicks = [
+      { img: "https://img.youtube.com/vi/M7lc1UVf-VE/0.jpg", link: "https://www.youtube.com/watch?v=M7lc1UVf-VE" },
+      { img: "https://img.youtube.com/vi/E7wJTI-1dvQ/0.jpg", link: "https://www.youtube.com/watch?v=E7wJTI-1dvQ" },
+      { img: "https://img.youtube.com/vi/iik25wqIuFo/0.jpg", link: "https://www.youtube.com/watch?v=iik25wqIuFo" }
+    ];
+    const extraYoutube = [
+      { img: "https://img.youtube.com/vi/ScMzIvxBSi4/0.jpg", link: "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
+      { img: "https://img.youtube.com/vi/OPf0YbXqDm0/0.jpg", link: "https://www.youtube.com/watch?v=OPf0YbXqDm0" },
+      { img: "https://img.youtube.com/vi/1w7OgIMMRc4/0.jpg", link: "https://www.youtube.com/watch?v=1w7OgIMMRc4" }
+    ];
+    const extraMusic = [
+      { img: "https://img.youtube.com/vi/ktvTqknDobU/0.jpg", link: "https://www.youtube.com/watch?v=ktvTqknDobU" },
+      { img: "https://img.youtube.com/vi/uelHwf8o7_U/0.jpg", link: "https://www.youtube.com/watch?v=uelHwf8o7_U" },
+      { img: "https://img.youtube.com/vi/3JZ4pnNtyxQ/0.jpg", link: "https://www.youtube.com/watch?v=3JZ4pnNtyxQ" }
+    ];
+    const extraVideogames = [
+      { img: "https://img.youtube.com/vi/X2Y3Ww5_6gU/0.jpg", link: "https://www.youtube.com/watch?v=X2Y3Ww5_6gU" },
+      { img: "https://img.youtube.com/vi/N4mEzFDjqtA/0.jpg", link: "https://www.youtube.com/watch?v=N4mEzFDjqtA" },
+      { img: "https://img.youtube.com/vi/mWRsgZuwf_8/0.jpg", link: "https://www.youtube.com/watch?v=mWRsgZuwf_8" }
+    ];
+    const extraBooks = [
+      { img: "https://img.youtube.com/vi/fLexgOxsZu0/0.jpg", link: "https://www.youtube.com/watch?v=fLexgOxsZu0" },
+      { img: "https://img.youtube.com/vi/2vjPBrBU-TM/0.jpg", link: "https://www.youtube.com/watch?v=2vjPBrBU-TM" },
+      { img: "https://img.youtube.com/vi/QtXby3twMmI/0.jpg", link: "https://www.youtube.com/watch?v=QtXby3twMmI" }
+    ];
+    const extraServices = [
+      { img: "https://img.youtube.com/vi/06vZtI9c6_M/0.jpg", link: "https://www.youtube.com/watch?v=06vZtI9c6_M" },
+      { img: "https://img.youtube.com/vi/LM8XHLYJoYs/0.jpg", link: "https://www.youtube.com/watch?v=LM8XHLYJoYs" },
+      { img: "https://img.youtube.com/vi/Zi_XLOBDo_Y/0.jpg", link: "https://www.youtube.com/watch?v=Zi_XLOBDo_Y" }
+    ];
+    
+    // Generate 19 random photography items
+    const photographyData = [];
+    for (let i = 1; i <= 19; i++) {
+      photographyData.push({
+        img: `https://picsum.photos/seed/photography${i}/800/600`,
+        link: `https://picsum.photos/seed/photography${i}/800/600`
+      });
+    }
+    
+    // Main category data object
+    const categoryData = {
+      toppicks: [
+        { img: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg", link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+        { img: "https://img.youtube.com/vi/9bZkp7q19f0/0.jpg", link: "https://www.youtube.com/watch?v=9bZkp7q19f0" },
+        { img: "https://img.youtube.com/vi/dTAAsCNK7RA/0.jpg", link: "https://www.youtube.com/watch?v=dTAAsCNK7RA" },
+        { img: "https://img.youtube.com/vi/3fumBcKC6RE/0.jpg", link: "https://www.youtube.com/watch?v=3fumBcKC6RE" }
+      ].concat(extraToppicks),
+      youtube: [
+        { img: "https://img.youtube.com/vi/09R8_2nJtjg/0.jpg", link: "https://www.youtube.com/watch?v=09R8_2nJtjg" },
+        { img: "https://img.youtube.com/vi/7wtfhZwyrcc/0.jpg", link: "https://www.youtube.com/watch?v=7wtfhZwyrcc" },
+        { img: "https://img.youtube.com/vi/1G4isv_Fylg/0.jpg", link: "https://www.youtube.com/watch?v=1G4isv_Fylg" },
+        { img: "https://img.youtube.com/vi/tVj0ZTS4WF4/0.jpg", link: "https://www.youtube.com/watch?v=tVj0ZTS4WF4" }
+      ].concat(extraYoutube),
+      music: [
+        { img: "https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg", link: "https://www.youtube.com/watch?v=JGwWNGJdvx8" },
+        { img: "https://img.youtube.com/vi/e-ORhEE9VVg/0.jpg", link: "https://www.youtube.com/watch?v=e-ORhEE9VVg" },
+        { img: "https://img.youtube.com/vi/YQHsXMglC9A/0.jpg", link: "https://www.youtube.com/watch?v=YQHsXMglC9A" },
+        { img: "https://img.youtube.com/vi/RgKAFK5djSk/0.jpg", link: "https://www.youtube.com/watch?v=RgKAFK5djSk" }
+      ].concat(extraMusic),
+      videogames: [
+        { img: "https://img.youtube.com/vi/MmB9b5njVbA/0.jpg", link: "https://www.youtube.com/watch?v=MmB9b5njVbA" },
+        { img: "https://img.youtube.com/vi/2F5vbl9XgHE/0.jpg", link: "https://www.youtube.com/watch?v=2F5vbl9XgHE" },
+        { img: "https://img.youtube.com/vi/QkkoHAzjnUs/0.jpg", link: "https://www.youtube.com/watch?v=QkkoHAzjnUs" },
+        { img: "https://img.youtube.com/vi/V-_O7nl0Ii0/0.jpg", link: "https://www.youtube.com/watch?v=V-_O7nl0Ii0" }
+      ].concat(extraVideogames),
+      books: [
+        { img: "https://img.youtube.com/vi/6XgNFRKrcwc/0.jpg", link: "https://www.youtube.com/watch?v=6XgNFRKrcwc" },
+        { img: "https://img.youtube.com/vi/Ih2JhrRmpT8/0.jpg", link: "https://www.youtube.com/watch?v=Ih2JhrRmpT8" },
+        { img: "https://img.youtube.com/vi/EO4XtR-hpUQ/0.jpg", link: "https://www.youtube.com/watch?v=EO4XtR-hpUQ" },
+        { img: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", link: "https://www.youtube.com/watch?v=LXb3EKWsInQ" }
+      ].concat(extraBooks),
+      services: [
+        { img: "https://img.youtube.com/vi/3KquFZYi6L0/0.jpg", link: "https://www.youtube.com/watch?v=3KquFZYi6L0" },
+        { img: "https://img.youtube.com/vi/EwTZ2xpQwpA/0.jpg", link: "https://www.youtube.com/watch?v=EwTZ2xpQwpA" },
+        { img: "https://img.youtube.com/vi/oHg5SJYRHA0/0.jpg", link: "https://www.youtube.com/watch?v=oHg5SJYRHA0" },
+        { img: "https://img.youtube.com/vi/J---aiyznGQ/0.jpg", link: "https://www.youtube.com/watch?v=J---aiyznGQ" }
+      ].concat(extraServices),
+      photography: photographyData,
+      contact: "For inquiries, email: contact@example.com"
+    };
+    
+    // Load content for a given category
+    function loadContent(cat, el) {
+      let html = "";
+      if (cat === "home") {
+        html += `<h4 class="category-title">Latest</h4><div class="grid">`;
+        Object.keys(categoryData).forEach(key => {
+          if (!["toppicks", "photography", "contact"].includes(key)) {
+            const items = categoryData[key];
+            if (items && items.length) {
+              const latest = items[items.length - 1];
+              html += `<a href="${latest.link}" target="_blank" class="thumb">
+                        <img src="${latest.img}" alt="Latest from ${key}">
+                        <span class="desc">Latest from ${getDisplayTitle(key)}</span>
+                       </a>`;
+            }
+          }
+        });
+        html += `</div>`;
+      } else if (cat === "contact") {
+        html = `<h4 class="category-title">Contact</h4>
+          <div class="contact-form">
+            <form action="mailto:ninewinters@hotmail.com" method="POST" enctype="text/plain">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" required>
+              <label for="subject">Subject:</label>
+              <input type="text" id="subject" name="subject" required>
+              <label for="message">Message:</label>
+              <textarea id="message" name="message" rows="4" required></textarea>
+              <button type="submit">Send</button>
+            </form>
+          </div>`;
+      } else if (cat === "photography") {
+        html += `<h4 class="category-title">Photography</h4><div class="grid">`;
+        categoryData[cat].slice().reverse().forEach(item => {
+          html += `<div class="photo" onclick="openModal('${item.img}')">
+                    <img src="${item.img}" alt="Photography">
+                   </div>`;
+        });
+        html += `</div>`;
+      } else if (cat === "search") {
+        html += `<h4 class="category-title">Search Results</h4>`;
+        if (el.results && el.results.length) {
+          html += `<div class="grid">`;
+          el.results.forEach(item => {
+            html += `<a href="${item.link}" target="_blank" class="thumb">
+                      <img src="${item.img}" alt="${item.title} thumbnail">
+                      <span class="desc">
+                        This is an extended sample description for ${item.title}. Enjoy the vibrant display and explore more details.
+                      </span>
+                     </a>`;
+          });
+          html += `</div>`;
+        } else {
+          html += `<p>No results found for "${el.query}"</p>`;
+        }
+      } else {
+        let title = getDisplayTitle(cat);
+        html += `<h4 class="category-title">${title}</h4><div class="grid">`;
+        categoryData[cat].slice().reverse().forEach(item => {
+          html += `<a href="${item.link}" target="_blank" class="thumb">
+                    <img src="${item.img}" alt="${title} thumbnail">
+                    <span class="desc">
+                      This is an extended sample description for ${title}. Enjoy the vibrant display and explore more details.
+                    </span>
+                   </a>`;
+        });
+        html += `</div>`;
+      }
+      document.getElementById("main-content").innerHTML = html;
+      document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+      if (el && el.tagName) { el.classList.add("active"); }
+      if (window.innerWidth <= 768) {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("main-content").classList.remove("shift");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return false;
+    }
+    
+    // Toggle sidebar for small screens
+    function toggleMenu() {
+      const sidebar = document.getElementById("sidebar");
+      const content = document.getElementById("main-content");
+      sidebar.classList.toggle("open");
+      content.classList.toggle("shift");
+    }
+    
+    // Open photography modal
+    function openModal(src) {
+      const modal = document.getElementById("photoModal");
+      modal.style.display = "flex";
+      modal.querySelector("img").src = src;
+    }
+    
+    // Close photography modal
+    function closeModal() {
+      document.getElementById("photoModal").style.display = "none";
+    }
+    
+    // Search function: searches descriptions and titles
+    function doSearch() {
+      let query = document.getElementById("searchInput").value.trim();
+      if (!query) {
+        alert("Please enter a search term.");
+        return;
+      }
+      query = query.toLowerCase();
+      let results = [];
+      for (let key in categoryData) {
+        if (Array.isArray(categoryData[key]) && key !== "photography" && key !== "contact") {
+          let title = getDisplayTitle(key);
+          let desc = "This is an extended sample description for " + title + ". Enjoy the vibrant display and explore more details.";
+          if (desc.toLowerCase().indexOf(query) !== -1 || title.toLowerCase().indexOf(query) !== -1) {
+            categoryData[key].forEach(item => {
+              results.push({ img: item.img, link: item.link, title: title });
+            });
+          }
+        }
+      }
+      loadContent("search", { results: results, query: query });
+    }
+    
+    // Allow Enter key to trigger search
+    document.getElementById("searchInput").addEventListener("keyup", function(event) {
+      if (event.key === "Enter") { doSearch(); }
+    });
+    
+    // Load home content by default
+    loadContent("home", document.getElementById("home-link"));
+  </script>
+</body>
+</html>

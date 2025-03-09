@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dynamic Sidebar Site</title>
   <style>
     :root {
       --bg: #0f0f0f;
       --hover: #333;
-      --active: #333;
-      --active-hover: #4d4d4d;
-      --button-bg: #1a1a1a;
-      --button-hover: #2a2a2d;
+      /* Sidebar active styles */
+      --sidebar-active-bg: #444;
+      --sidebar-active-border: #fff;
+      --burger-bg: rgba(80,80,80,0.5);
+      --burger-hover: rgba(80,80,80,0.8);
       --font-color: #fff;
     }
     * {
@@ -19,9 +20,29 @@
     }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--font-color);
+    }
+    /* Burger Menu */
+    .menu-toggle {
+      display: block;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      background: var(--burger-bg);
+      color: var(--font-color);
+      border: none;
+      padding: 10px;
+      z-index: 300;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border-radius: 10px;
+      user-select: none;
+    }
+    .menu-toggle:hover {
+      background: var(--burger-hover);
     }
     /* Sidebar */
     .sidebar {
@@ -31,39 +52,86 @@
       width: 200px;
       height: 100%;
       background: var(--bg);
-      padding: 10px;
-      z-index: 100;
+      padding: 60px 15px 10px 10px;
+      overflow-y: auto;
+      z-index: 200;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+      user-select: none;
     }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    /* Sidebar Header */
+    .sidebar-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      user-select: none;
+    }
+    .site-title-button {
+      background: var(--bg);
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: var(--font-color);
+      cursor: default;
+      user-select: none;
+      transform: translateX(10px);
+    }
+    .site-title-button:focus {
+      outline: none;
+    }
+    .site-title-button .emoji {
+      font-size: 1.5em;
+    }
+    .site-title-button .sw {
+      font-family: Monaco, "Courier New", monospace !important;
+      font-weight: bold;
+      font-size: 1.9em;
+      line-height: 1;
+      margin-left: -0.2em;
+      letter-spacing: -0.1em;
+    }
+    /* Sidebar Links */
     .sidebar a {
       display: block;
       color: var(--font-color);
       text-decoration: none;
-      padding: 10px 15px;
-      margin-bottom: 5px;
-      border-radius: 4px;
-      font-size: 20px;
+      padding: 8px 10px;
+      margin-bottom: 1px;
+      border-radius: 0;
+      font-size: 18px;
       background: var(--bg);
       transition: background 0.3s;
+      user-select: none;
     }
     .sidebar a:hover {
       background: var(--hover);
     }
     .sidebar a.active {
-      background: var(--active);
+      background: var(--sidebar-active-bg);
       font-weight: bold;
+      border-right: 4px solid var(--sidebar-active-border);
     }
     .sidebar a.active:hover {
-      background: var(--active-hover);
+      background: var(--sidebar-active-bg);
     }
     /* Search Container */
     .search-container {
-      margin-top: 20px;
       display: flex;
       align-items: center;
-      width: 100%;
+      margin: 5px 0 5px 0;  /* reduced bottom margin to move links closer */
     }
     .search-container input {
-      width: calc(100% - 45px);
+      width: calc(100% - 50px);
       padding: 5px;
       border: 1px solid #444;
       border-radius: 4px;
@@ -75,65 +143,70 @@
       width: 40px;
       height: 40px;
       border: none;
-      background: var(--button-bg);
+      background: var(--burger-bg);
       border-radius: 50%;
       cursor: pointer;
-      margin-left: 5px;
+      margin-left: 10px;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 1;
+      transition: background 0.3s ease;
+      color: var(--font-color);
+      user-select: none;
+    }
+    .search-container button:hover {
+      background: var(--burger-hover);
     }
     .search-container button svg {
-      width: 20px;
-      height: 20px;
-      fill: var(--font-color);
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      user-select: none;
     }
-    /* Content */
+    /* Main Content */
     .content {
-      margin-left: 200px;
+      margin-left: 0;
       padding: 20px;
       background: var(--bg);
+      transition: margin-left 0.3s ease;
+      user-select: none;
     }
-    /* Burger Menu */
-    .menu-toggle {
-      display: none;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 24px;
-      background: var(--bg);
-      color: var(--font-color);
-      border: none;
-      padding: 10px;
-      z-index: 200;
+    .sidebar.open + .content {
+      margin-left: 200px;
+    }
+    /* Home Title Tabs */
+    .home-title-tabs {
+      display: inline-flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 10px;
+      user-select: none;
+    }
+    .home-title-tabs .tab {
       cursor: pointer;
+      padding-bottom: 4px;
+      border-bottom: 4px solid transparent;
+      transition: border-bottom 0.3s;
+      border-radius: 0;
+      user-select: none;
     }
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-      }
-      .sidebar {
-        left: -200px;
-        transition: left 0.3s;
-      }
-      .sidebar.open {
-        left: 0;
-      }
-      .content {
-        margin-left: 0;
-        transition: margin-left 0.3s;
-      }
-      .content.shift {
-        margin-left: 200px;
-      }
+    .home-title-tabs .tab.active {
+      border-bottom: 4px solid #fff;
+    }
+    .home-title-tabs .tab:hover:not(.active) {
+      border-bottom: 4px solid #bbb;
     }
     /* Grid Layout */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 40px;
+      margin-top: 10px;
+      user-select: none;
     }
     .grid a,
     .grid div {
@@ -143,6 +216,7 @@
       background: var(--bg);
       aspect-ratio: 16/9;
       position: relative;
+      user-select: none;
     }
     .grid img {
       width: calc(100% - 4px);
@@ -151,11 +225,23 @@
       margin: 2px;
       border-radius: 8px;
       background: var(--bg);
+      user-select: none;
     }
-    /* Tooltip (hidden by default) */
+    /* Lazy-Loaded Images with Faster Fade-in */
+    img.lazy {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease-out;
+    }
+    img.lazy.loaded {
+      opacity: 1;
+      visibility: visible;
+    }
+    /* Tooltip on hover */
     .thumb {
       position: relative;
       display: inline-block;
+      user-select: none;
     }
     .thumb .desc {
       display: none;
@@ -172,6 +258,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      user-select: none;
     }
     .thumb:hover .desc {
       display: flex;
@@ -180,10 +267,12 @@
     .contact-form {
       margin-top: 40px;
       width: 50%;
+      user-select: none;
     }
     .contact-form label {
       display: block;
       margin: 10px 0;
+      user-select: none;
     }
     .contact-form input,
     .contact-form textarea {
@@ -194,6 +283,7 @@
       border-radius: 4px;
       margin-bottom: 10px;
       font-size: 20px;
+      user-select: none;
     }
     .contact-form input[type="email"],
     .contact-form input[type="text"] {
@@ -204,7 +294,7 @@
       height: 160px;
     }
     .contact-form button {
-      background: var(--button-bg);
+      background: var(--burger-bg);
       color: var(--font-color);
       border: none;
       padding: 12px 20px;
@@ -212,9 +302,10 @@
       cursor: pointer;
       transition: background 0.3s;
       font-size: 16px;
+      user-select: none;
     }
     .contact-form button:hover {
-      background: var(--button-hover);
+      background: var(--burger-hover);
     }
     /* Back-to-Top Button */
     #backToTop {
@@ -231,7 +322,8 @@
       font-size: 20px;
       cursor: pointer;
       transition: background 0.3s;
-      z-index: 200;
+      z-index: 300;
+      user-select: none;
     }
     #backToTop:hover {
       background: #555;
@@ -239,12 +331,13 @@
     .arrow-up {
       display: inline-block;
       transform: rotate(-90deg);
+      user-select: none;
     }
     /* Photography Modal */
     #photoModal {
       display: none;
       position: fixed;
-      z-index: 300;
+      z-index: 400;
       left: 0;
       top: 0;
       width: 100%;
@@ -252,11 +345,13 @@
       background: rgba(0, 0, 0, 0.8);
       justify-content: center;
       align-items: center;
+      user-select: none;
     }
     #photoModal img {
       max-width: 90%;
       max-height: 90%;
       border-radius: 4px;
+      user-select: none;
     }
     #photoModal .close {
       position: absolute;
@@ -265,65 +360,136 @@
       font-size: 40px;
       color: var(--font-color);
       cursor: pointer;
-      z-index: 310;
+      z-index: 410;
+      user-select: none;
     }
-    /* Category Titles */
+    /* Category Titles & Sections */
     .category-title {
-      font-size: 1.5em;
-      margin: 0;
+      font-size: 1.4em;
+      margin: 0 0 10px;
+      user-select: none;
     }
-    /* Photography thumbnails clickable */
-    .grid .photo {
-      cursor: pointer;
+    .category-section {
+      margin-bottom: 40px;
+      user-select: none;
+    }
+    .category-name {
+      font-size: 0.9em;
+      margin: 0 0 5px;
+      color: var(--font-color);
+      user-select: none;
+    }
+    .category-name a {
+      color: var(--font-color);
+      text-decoration: none;
+      transition: color 0.3s;
+      user-select: none;
+    }
+    .category-name a:hover {
+      color: var(--font-color);
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <!-- Burger Menu & Back-to-Top Button -->
+  <!-- Burger Menu -->
   <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
-  <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
   
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <a href="#" id="home-link" onclick="return loadContent('home', this);">Home</a>
-    <a href="#" onclick="return loadContent('toppicks', this);">Top Picks</a>
-    <a href="#" onclick="return loadContent('youtube', this);">YouTube</a>
-    <a href="#" onclick="return loadContent('music', this);">Music</a>
-    <a href="#" onclick="return loadContent('videogames', this);">Video Games</a>
-    <a href="#" onclick="return loadContent('books', this);">Books</a>
-    <a href="#" onclick="return loadContent('services', this);">Services</a>
-    <a href="#" onclick="return loadContent('photography', this);">Photography</a>
-    <a href="#" onclick="return loadContent('contact', this);">Contact</a>
+    <div class="sidebar-header">
+      <button class="site-title-button" onclick="return loadContent('home', this);" tabindex="-1">
+        <span class="emoji">❄️</span><span class="sw">SW</span>
+      </button>
+    </div>
     <!-- Search Bar -->
     <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search...">
+      <input type="text" id="searchInput" placeholder="Search..." autofocus>
       <button onclick="doSearch()">
-        <svg viewBox="0 0 512 512">
-          <path d="M505 442.7l-99.7-99.7C429.6 305.8 440 274.6 440 240 440 107.3 332.7 0 200 0S-40 107.3-40 240s107.3 240 240 240c34.6 0 65.8-10.4 103-34.7l99.7 99.7c4.5 4.5 10.6 6.8 16.7 6.8s12.2-2.3 16.7-6.8c9.4-9.4 9.4-24.6 0-34zM200 368c-70.7 0-128-57.3-128-128S129.3 112 200 112s128 57.3 128 128-57.3 128-128 128z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path fill="#fff" d="M505 442.7L405.3 343c28.4-34.9 45.7-79 45.7-127C451 96.5 354.5 0 225.5 0S0 96.5 0 216s96.5 216 225.5 216c34.6 0 65.8-10.4 103-34.7l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l22.7-22.7c9.4-9.4 9.4-24.6.1-34zM225.5 360c-77 0-139-62-139-139S148.5 82 225.5 82s139 62 139 139-62 139-139 139z"/>
         </svg>
       </button>
     </div>
+    <!-- Sidebar Category Links -->
+    <a href="#" id="home-link" onclick="return loadContent('home', this);">Home</a>
+    <a href="#" onclick="return loadContent('toppicks', this);">Top Picks</a>
+    <a href="#" onclick="return loadContent('series', this);">Series</a>
+    <a href="#" onclick="return loadContent('youtube', this);">YouTube</a>
+    <a href="#" onclick="return loadContent('videogames', this);">Video Games</a>
+    <a href="#" onclick="return loadContent('music', this);">Music</a>
+    <a href="#" onclick="return loadContent('books', this);">Books</a>
+    <a href="#" onclick="return loadContent('store', this);">Store</a>
+    <a href="#" onclick="return loadContent('services', this);">Services</a>
+    <a href="#" onclick="return loadContent('photography', this);">Photography</a>
+    <a href="#" onclick="return loadContent('contact', this);">Contact</a>
   </div>
   
   <!-- Main Content Area -->
   <div class="content" id="main-content">
-    <h4 class="category-title">Welcome</h4>
-    <p>Select a category from the sidebar.</p>
+    <!-- Home page: main title with inline mode tabs -->
+    <h4 class="category-title">
+      <span class="home-title-tabs">
+        <span class="tab ${homeMode === "latest" ? "active" : ""}" onclick="setHomeMode('latest')" id="tab-latest">Latest</span>
+        <span class="tab ${homeMode === "oldest" ? "active" : ""}" onclick="setHomeMode('oldest')" id="tab-oldest">Oldest</span>
+        <span class="tab ${homeMode === "random" ? "active" : ""}" onclick="setHomeMode('random')" id="tab-random">Random</span>
+      </span>
+    </h4>
+    <!-- Sub-category sections will be rendered here dynamically -->
   </div>
+  
+  <!-- Back-to-Top Button -->
+  <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
   
   <!-- Photography Modal Popup -->
   <div id="photoModal" onclick="if(event.target === this){ closeModal(); }">
     <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
-    <img src="" alt="Full Size">
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="" alt="Full Size" class="lazy">
   </div>
   
   <script>
+    // Global variable for home mode (latest, oldest, or random)
+    let homeMode = "latest";
+    
+    // Custom order for home sub-categories (Note: "store" replaces "booksExtra")
+    const homeOrder = ["youtube", "videogames", "music", "series", "toppicks", "books", "store", "services"];
+    
+    // Utility: Get N random items from an array
+    function getRandomItems(arr, n) {
+      let result = [];
+      let taken = [];
+      n = Math.min(n, arr.length);
+      while(result.length < n) {
+        let index = Math.floor(Math.random() * arr.length);
+        if (!taken[index]) {
+          result.push(arr[index]);
+          taken[index] = true;
+        }
+      }
+      return result;
+    }
+    
+    // Lazy load images with fade-in effect using Intersection Observer
+    function lazyLoadImages() {
+      const lazyImages = document.querySelectorAll("img.lazy:not(.loaded)");
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            img.classList.add("loaded");
+            observer.unobserve(img);
+          }
+        });
+      });
+      lazyImages.forEach(img => imageObserver.observe(img));
+    }
+    
     // Show or hide the back-to-top button
     window.onscroll = function() {
       document.getElementById("backToTop").style.display =
         (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
     };
-    
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -332,110 +498,157 @@
     function getDisplayTitle(cat) {
       if (cat === "toppicks") return "Top Picks";
       if (cat === "videogames") return "Video Games";
+      if (cat === "store") return "Store";
+      if (cat === "series") return "Series";
       return cat.charAt(0).toUpperCase() + cat.slice(1);
     }
     
-    // Extra items arrays for categories
+    // Adjust sidebar based on content height
+    function adjustSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar.scrollHeight <= window.innerHeight) {
+        sidebar.classList.add("open");
+      } else {
+        sidebar.classList.remove("open");
+      }
+    }
+    window.addEventListener("load", adjustSidebar);
+    window.addEventListener("resize", adjustSidebar);
+    
+    // Extra items arrays with descriptions
     const extraToppicks = [
-      { img: "https://img.youtube.com/vi/M7lc1UVf-VE/0.jpg", link: "https://www.youtube.com/watch?v=M7lc1UVf-VE" },
-      { img: "https://img.youtube.com/vi/E7wJTI-1dvQ/0.jpg", link: "https://www.youtube.com/watch?v=E7wJTI-1dvQ" },
-      { img: "https://img.youtube.com/vi/iik25wqIuFo/0.jpg", link: "https://www.youtube.com/watch?v=iik25wqIuFo" }
+      { img: "https://img.youtube.com/vi/M7lc1UVf-VE/0.jpg", link: "https://www.youtube.com/watch?v=M7lc1UVf-VE", desc: "Extra Top Pick 1" },
+      { img: "https://img.youtube.com/vi/E7wJTI-1dvQ/0.jpg", link: "https://www.youtube.com/watch?v=E7wJTI-1dvQ", desc: "Extra Top Pick 2" },
+      { img: "https://img.youtube.com/vi/iik25wqIuFo/0.jpg", link: "https://www.youtube.com/watch?v=iik25wqIuFo", desc: "Extra Top Pick 3" }
     ];
     const extraYoutube = [
-      { img: "https://img.youtube.com/vi/ScMzIvxBSi4/0.jpg", link: "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-      { img: "https://img.youtube.com/vi/OPf0YbXqDm0/0.jpg", link: "https://www.youtube.com/watch?v=OPf0YbXqDm0" },
-      { img: "https://img.youtube.com/vi/1w7OgIMMRc4/0.jpg", link: "https://www.youtube.com/watch?v=1w7OgIMMRc4" }
+      { img: "https://img.youtube.com/vi/ScMzIvxBSi4/0.jpg", link: "https://www.youtube.com/watch?v=ScMzIvxBSi4", desc: "Extra YouTube 1" },
+      { img: "https://img.youtube.com/vi/OPf0YbXqDm0/0.jpg", link: "https://www.youtube.com/watch?v=OPf0YbXqDm0", desc: "Extra YouTube 2" },
+      { img: "https://img.youtube.com/vi/1w7OgIMMRc4/0.jpg", link: "https://www.youtube.com/watch?v=1w7OgIMMRc4", desc: "Extra YouTube 3" }
     ];
     const extraMusic = [
-      { img: "https://img.youtube.com/vi/ktvTqknDobU/0.jpg", link: "https://www.youtube.com/watch?v=ktvTqknDobU" },
-      { img: "https://img.youtube.com/vi/uelHwf8o7_U/0.jpg", link: "https://www.youtube.com/watch?v=uelHwf8o7_U" },
-      { img: "https://img.youtube.com/vi/3JZ4pnNtyxQ/0.jpg", link: "https://www.youtube.com/watch?v=3JZ4pnNtyxQ" }
+      { img: "https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg", link: "https://www.youtube.com/watch?v=JGwWNGJdvx8", desc: "Extra Music 1" },
+      { img: "https://img.youtube.com/vi/e-ORhEE9VVg/0.jpg", link: "https://www.youtube.com/watch?v=e-ORhEE9VVg", desc: "Extra Music 2" },
+      { img: "https://img.youtube.com/vi/YQHsXMglC9A/0.jpg", link: "https://www.youtube.com/watch?v=YQHsXMglC9A", desc: "Extra Music 3" }
     ];
     const extraVideogames = [
-      { img: "https://img.youtube.com/vi/X2Y3Ww5_6gU/0.jpg", link: "https://www.youtube.com/watch?v=X2Y3Ww5_6gU" },
-      { img: "https://img.youtube.com/vi/N4mEzFDjqtA/0.jpg", link: "https://www.youtube.com/watch?v=N4mEzFDjqtA" },
-      { img: "https://img.youtube.com/vi/mWRsgZuwf_8/0.jpg", link: "https://www.youtube.com/watch?v=mWRsgZuwf_8" }
+      { img: "https://img.youtube.com/vi/X2Y3Ww5_6gU/0.jpg", link: "https://www.youtube.com/watch?v=X2Y3Ww5_6gU", desc: "Extra Videogame 1" },
+      { img: "https://img.youtube.com/vi/N4mEzFDjqtA/0.jpg", link: "https://www.youtube.com/watch?v=N4mEzFDjqtA", desc: "Extra Videogame 2" },
+      { img: "https://img.youtube.com/vi/mWRsgZuwf_8/0.jpg", link: "https://www.youtube.com/watch?v=mWRsgZuwf_8", desc: "Extra Videogame 3" }
     ];
     const extraBooks = [
-      { img: "https://img.youtube.com/vi/fLexgOxsZu0/0.jpg", link: "https://www.youtube.com/watch?v=fLexgOxsZu0" },
-      { img: "https://img.youtube.com/vi/2vjPBrBU-TM/0.jpg", link: "https://www.youtube.com/watch?v=2vjPBrBU-TM" },
-      { img: "https://img.youtube.com/vi/QtXby3twMmI/0.jpg", link: "https://www.youtube.com/watch?v=QtXby3twMmI" }
+      { img: "https://img.youtube.com/vi/fLexgOxsZu0/0.jpg", link: "https://www.youtube.com/watch?v=fLexgOxsZu0", desc: "Extra Book 1" },
+      { img: "https://img.youtube.com/vi/2vjPBrBU-TM/0.jpg", link: "https://www.youtube.com/watch?v=2vjPBrBU-TM", desc: "Extra Book 2" },
+      { img: "https://img.youtube.com/vi/QtXby3twMmI/0.jpg", link: "https://www.youtube.com/watch?v=QtXby3twMmI", desc: "Extra Book 3" }
     ];
     const extraServices = [
-      { img: "https://img.youtube.com/vi/06vZtI9c6_M/0.jpg", link: "https://www.youtube.com/watch?v=06vZtI9c6_M" },
-      { img: "https://img.youtube.com/vi/LM8XHLYJoYs/0.jpg", link: "https://www.youtube.com/watch?v=LM8XHLYJoYs" },
-      { img: "https://img.youtube.com/vi/Zi_XLOBDo_Y/0.jpg", link: "https://www.youtube.com/watch?v=Zi_XLOBDo_Y" }
+      { img: "https://img.youtube.com/vi/06vZtI9c6_M/0.jpg", link: "https://www.youtube.com/watch?v=06vZtI9c6_M", desc: "Extra Service 1" },
+      { img: "https://img.youtube.com/vi/LM8XHLYJoYs/0.jpg", link: "https://www.youtube.com/watch?v=LM8XHLYJoYs", desc: "Extra Service 2" },
+      { img: "https://img.youtube.com/vi/Zi_XLOBDo_Y/0.jpg", link: "https://www.youtube.com/watch?v=Zi_XLOBDo_Y", desc: "Extra Service 3" }
     ];
     
-    // Generate 19 random photography items
+    // Generate 19 random photography items with descriptions
     const photographyData = [];
     for (let i = 1; i <= 19; i++) {
       photographyData.push({
         img: `https://picsum.photos/seed/photography${i}/800/600`,
-        link: `https://picsum.photos/seed/photography${i}/800/600`
+        link: `https://picsum.photos/seed/photography${i}/800/600`,
+        desc: `Photography image ${i}`
       });
     }
     
     // Main category data object
     const categoryData = {
       toppicks: [
-        { img: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg", link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-        { img: "https://img.youtube.com/vi/9bZkp7q19f0/0.jpg", link: "https://www.youtube.com/watch?v=9bZkp7q19f0" },
-        { img: "https://img.youtube.com/vi/dTAAsCNK7RA/0.jpg", link: "https://www.youtube.com/watch?v=dTAAsCNK7RA" },
-        { img: "https://img.youtube.com/vi/3fumBcKC6RE/0.jpg", link: "https://www.youtube.com/watch?v=3fumBcKC6RE" }
+        { img: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg", link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", desc: "Rick Astley - Never Gonna Give You Up" },
+        { img: "https://img.youtube.com/vi/9bZkp7q19f0/0.jpg", link: "https://www.youtube.com/watch?v=9bZkp7q19f0", desc: "Top Pick 2" },
+        { img: "https://img.youtube.com/vi/dTAAsCNK7RA/0.jpg", link: "https://www.youtube.com/watch?v=dTAAsCNK7RA", desc: "Top Pick 3" },
+        { img: "https://img.youtube.com/vi/3fumBcKC6RE/0.jpg", link: "https://www.youtube.com/watch?v=3fumBcKC6RE", desc: "Top Pick 4" }
       ].concat(extraToppicks),
+      series: [
+        { img: "https://img.youtube.com/vi/5NV6Rdv1a3I/0.jpg", link: "https://www.youtube.com/watch?v=5NV6Rdv1a3I", desc: "Series item 1" },
+        { img: "https://img.youtube.com/vi/oYmqJl4MoNI/0.jpg", link: "https://www.youtube.com/watch?v=oYmqJl4MoNI", desc: "Series item 2" },
+        { img: "https://img.youtube.com/vi/kffacxfA7G4/0.jpg", link: "https://www.youtube.com/watch?v=kffacxfA7G4", desc: "Series item 3" },
+        { img: "https://img.youtube.com/vi/60ItHLz5WEA/0.jpg", link: "https://www.youtube.com/watch?v=60ItHLz5WEA", desc: "Series item 4" }
+      ],
       youtube: [
-        { img: "https://img.youtube.com/vi/09R8_2nJtjg/0.jpg", link: "https://www.youtube.com/watch?v=09R8_2nJtjg" },
-        { img: "https://img.youtube.com/vi/7wtfhZwyrcc/0.jpg", link: "https://www.youtube.com/watch?v=7wtfhZwyrcc" },
-        { img: "https://img.youtube.com/vi/1G4isv_Fylg/0.jpg", link: "https://www.youtube.com/watch?v=1G4isv_Fylg" },
-        { img: "https://img.youtube.com/vi/tVj0ZTS4WF4/0.jpg", link: "https://www.youtube.com/watch?v=tVj0ZTS4WF4" }
-      ].concat(extraYoutube),
-      music: [
-        { img: "https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg", link: "https://www.youtube.com/watch?v=JGwWNGJdvx8" },
-        { img: "https://img.youtube.com/vi/e-ORhEE9VVg/0.jpg", link: "https://www.youtube.com/watch?v=e-ORhEE9VVg" },
-        { img: "https://img.youtube.com/vi/YQHsXMglC9A/0.jpg", link: "https://www.youtube.com/watch?v=YQHsXMglC9A" },
-        { img: "https://img.youtube.com/vi/RgKAFK5djSk/0.jpg", link: "https://www.youtube.com/watch?v=RgKAFK5djSk" }
-      ].concat(extraMusic),
+        { img: "https://img.youtube.com/vi/09R8_2nJtjg/0.jpg", link: "https://www.youtube.com/watch?v=09R8_2nJtjg", desc: "YouTube item 1" },
+        { img: "https://img.youtube.com/vi/7wtfhZwyrcc/0.jpg", link: "https://www.youtube.com/watch?v=7wtfhZwyrcc", desc: "YouTube item 2" },
+        { img: "https://img.youtube.com/vi/1G4isv_Fylg/0.jpg", link: "https://www.youtube.com/watch?v=1G4isv_Fylg", desc: "YouTube item 3" },
+        { img: "https://img.youtube.com/vi/tVj0ZTS4WF4/0.jpg", link: "https://www.youtube.com/watch?v=tVj0ZTS4WF4", desc: "YouTube item 4" }
+      ],
       videogames: [
-        { img: "https://img.youtube.com/vi/MmB9b5njVbA/0.jpg", link: "https://www.youtube.com/watch?v=MmB9b5njVbA" },
-        { img: "https://img.youtube.com/vi/2F5vbl9XgHE/0.jpg", link: "https://www.youtube.com/watch?v=2F5vbl9XgHE" },
-        { img: "https://img.youtube.com/vi/QkkoHAzjnUs/0.jpg", link: "https://www.youtube.com/watch?v=QkkoHAzjnUs" },
-        { img: "https://img.youtube.com/vi/V-_O7nl0Ii0/0.jpg", link: "https://www.youtube.com/watch?v=V-_O7nl0Ii0" }
-      ].concat(extraVideogames),
+        { img: "https://img.youtube.com/vi/MmB9b5njVbA/0.jpg", link: "https://www.youtube.com/watch?v=MmB9b5njVbA", desc: "Video Game item 1" },
+        { img: "https://img.youtube.com/vi/2F5vbl9XgHE/0.jpg", link: "https://www.youtube.com/watch?v=2F5vbl9XgHE", desc: "Video Game item 2" },
+        { img: "https://img.youtube.com/vi/QkkoHAzjnUs/0.jpg", link: "https://www.youtube.com/watch?v=QkkoHAzjnUs", desc: "Video Game item 3" },
+        { img: "https://img.youtube.com/vi/V-_O7nl0Ii0/0.jpg", link: "https://www.youtube.com/watch?v=V-_O7nl0Ii0", desc: "Video Game item 4" }
+      ],
+      music: [
+        { img: "https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg", link: "https://www.youtube.com/watch?v=JGwWNGJdvx8", desc: "Music item 1" },
+        { img: "https://img.youtube.com/vi/e-ORhEE9VVg/0.jpg", link: "https://www.youtube.com/watch?v=e-ORhEE9VVg", desc: "Music item 2" },
+        { img: "https://img.youtube.com/vi/YQHsXMglC9A/0.jpg", link: "https://www.youtube.com/watch?v=YQHsXMglC9A", desc: "Music item 3" },
+        { img: "https://img.youtube.com/vi/RgKAFK5djSk/0.jpg", link: "https://www.youtube.com/watch?v=RgKAFK5djSk", desc: "Music item 4" }
+      ],
       books: [
-        { img: "https://img.youtube.com/vi/6XgNFRKrcwc/0.jpg", link: "https://www.youtube.com/watch?v=6XgNFRKrcwc" },
-        { img: "https://img.youtube.com/vi/Ih2JhrRmpT8/0.jpg", link: "https://www.youtube.com/watch?v=Ih2JhrRmpT8" },
-        { img: "https://img.youtube.com/vi/EO4XtR-hpUQ/0.jpg", link: "https://www.youtube.com/watch?v=EO4XtR-hpUQ" },
-        { img: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", link: "https://www.youtube.com/watch?v=LXb3EKWsInQ" }
+        { img: "https://img.youtube.com/vi/6XgNFRKrcwc/0.jpg", link: "https://www.youtube.com/watch?v=6XgNFRKrcwc", desc: "Book item 1" },
+        { img: "https://img.youtube.com/vi/Ih2JhrRmpT8/0.jpg", link: "https://www.youtube.com/watch?v=Ih2JhrRmpT8", desc: "Book item 2" },
+        { img: "https://img.youtube.com/vi/EO4XtR-hpUQ/0.jpg", link: "https://www.youtube.com/watch?v=EO4XtR-hpUQ", desc: "Book item 3" },
+        { img: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", link: "https://www.youtube.com/watch?v=LXb3EKWsInQ", desc: "Book item 4" }
+      ].concat(extraBooks),
+      store: [
+        { img: "https://img.youtube.com/vi/6XgNFRKrcwc/0.jpg", link: "https://www.youtube.com/watch?v=6XgNFRKrcwc", desc: "Book item 1" },
+        { img: "https://img.youtube.com/vi/Ih2JhrRmpT8/0.jpg", link: "https://www.youtube.com/watch?v=Ih2JhrRmpT8", desc: "Book item 2" },
+        { img: "https://img.youtube.com/vi/EO4XtR-hpUQ/0.jpg", link: "https://www.youtube.com/watch?v=EO4XtR-hpUQ", desc: "Book item 3" },
+        { img: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", link: "https://www.youtube.com/watch?v=LXb3EKWsInQ", desc: "Book item 4" }
       ].concat(extraBooks),
       services: [
-        { img: "https://img.youtube.com/vi/3KquFZYi6L0/0.jpg", link: "https://www.youtube.com/watch?v=3KquFZYi6L0" },
-        { img: "https://img.youtube.com/vi/EwTZ2xpQwpA/0.jpg", link: "https://www.youtube.com/watch?v=EwTZ2xpQwpA" },
-        { img: "https://img.youtube.com/vi/oHg5SJYRHA0/0.jpg", link: "https://www.youtube.com/watch?v=oHg5SJYRHA0" },
-        { img: "https://img.youtube.com/vi/J---aiyznGQ/0.jpg", link: "https://www.youtube.com/watch?v=J---aiyznGQ" }
+        { img: "https://img.youtube.com/vi/3KquFZYi6L0/0.jpg", link: "https://www.youtube.com/watch?v=3KquFZYi6L0", desc: "Service item 1" },
+        { img: "https://img.youtube.com/vi/EwTZ2xpQwpA/0.jpg", link: "https://www.youtube.com/watch?v=EwTZ2xpQwpA", desc: "Service item 2" },
+        { img: "https://img.youtube.com/vi/oHg5SJYRHA0/0.jpg", link: "https://www.youtube.com/watch?v=oHg5SJYRHA0", desc: "Service item 3" },
+        { img: "https://img.youtube.com/vi/J---aiyznGQ/0.jpg", link: "https://www.youtube.com/watch?v=J---aiyznGQ", desc: "Service item 4" }
       ].concat(extraServices),
       photography: photographyData,
       contact: "For inquiries, email: contact@example.com"
     };
     
-    // Load content for a given category
+    // Load content based on category (home uses homeMode and custom ordering)
     function loadContent(cat, el) {
       let html = "";
       if (cat === "home") {
-        html += `<h4 class="category-title">Latest</h4><div class="grid">`;
-        Object.keys(categoryData).forEach(key => {
-          if (!["toppicks", "photography", "contact"].includes(key)) {
-            const items = categoryData[key];
-            if (items && items.length) {
-              const latest = items[items.length - 1];
-              html += `<a href="${latest.link}" target="_blank" class="thumb">
-                        <img src="${latest.img}" alt="Latest from ${key}">
-                        <span class="desc">Latest from ${getDisplayTitle(key)}</span>
-                       </a>`;
+        html += `<h4 class="category-title">
+                   <span class="home-title-tabs">
+                     <span class="tab ${homeMode === "latest" ? "active" : ""}" onclick="setHomeMode('latest')" id="tab-latest">Latest</span>
+                     <span class="tab ${homeMode === "oldest" ? "active" : ""}" onclick="setHomeMode('oldest')" id="tab-oldest">Oldest</span>
+                     <span class="tab ${homeMode === "random" ? "active" : ""}" onclick="setHomeMode('random')" id="tab-random">Random</span>
+                   </span>
+                 </h4>`;
+        homeOrder.forEach(key => {
+          if (categoryData[key] && Array.isArray(categoryData[key])) {
+            let items = categoryData[key];
+            let selection = [];
+            if (homeMode === "latest") {
+              selection = items.slice(-3).reverse();
+            } else if (homeMode === "oldest") {
+              selection = items.slice(0, 3);
+            } else if (homeMode === "random") {
+              selection = getRandomItems(items, 3);
+            }
+            if (selection.length) {
+              html += `<div class="category-section">
+                         <h5 class="category-name">
+                           <a href="#" onclick="return loadContent('${key}', this)">${getDisplayTitle(key)}</a>
+                         </h5>
+                         <div class="grid home-grid">`;
+              selection.forEach(item => {
+                html += `<a href="${item.link}" target="_blank" class="thumb">
+                           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${item.img}" alt="${getDisplayTitle(key)} thumbnail" class="lazy">
+                           <span class="desc">${item.desc || ("Latest from " + getDisplayTitle(key))}</span>
+                         </a>`;
+              });
+              html += `</div></div>`;
             }
           }
         });
-        html += `</div>`;
       } else if (cat === "contact") {
         html = `<h4 class="category-title">Contact</h4>
           <div class="contact-form">
@@ -453,7 +666,8 @@
         html += `<h4 class="category-title">Photography</h4><div class="grid">`;
         categoryData[cat].slice().reverse().forEach(item => {
           html += `<div class="photo" onclick="openModal('${item.img}')">
-                    <img src="${item.img}" alt="Photography">
+                     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${item.img}" alt="Photography" class="lazy">
+                     <span class="desc">${item.desc || 'Photography image'}</span>
                    </div>`;
         });
         html += `</div>`;
@@ -463,10 +677,8 @@
           html += `<div class="grid">`;
           el.results.forEach(item => {
             html += `<a href="${item.link}" target="_blank" class="thumb">
-                      <img src="${item.img}" alt="${item.title} thumbnail">
-                      <span class="desc">
-                        This is an extended sample description for ${item.title}. Enjoy the vibrant display and explore more details.
-                      </span>
+                       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${item.img}" alt="${item.title} thumbnail" class="lazy">
+                       <span class="desc">${item.desc || 'No description available.'}</span>
                      </a>`;
           });
           html += `</div>`;
@@ -478,46 +690,50 @@
         html += `<h4 class="category-title">${title}</h4><div class="grid">`;
         categoryData[cat].slice().reverse().forEach(item => {
           html += `<a href="${item.link}" target="_blank" class="thumb">
-                    <img src="${item.img}" alt="${title} thumbnail">
-                    <span class="desc">
-                      This is an extended sample description for ${title}. Enjoy the vibrant display and explore more details.
-                    </span>
+                     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${item.img}" alt="${title} thumbnail" class="lazy">
+                     <span class="desc">${item.desc || 'No description available.'}</span>
                    </a>`;
         });
         html += `</div>`;
       }
       document.getElementById("main-content").innerHTML = html;
+      // Update active sidebar link: remove active class then mark matching link active.
       document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-      if (el && el.tagName) { el.classList.add("active"); }
-      if (window.innerWidth <= 768) {
-        document.getElementById("sidebar").classList.remove("open");
-        document.getElementById("main-content").classList.remove("shift");
+      if (el && el.tagName) {
+        if (el.closest(".sidebar")) {
+          el.classList.add("active");
+        } else {
+          document.querySelectorAll(".sidebar a").forEach(link => {
+            if (link.textContent.trim().toLowerCase() === getDisplayTitle(cat).toLowerCase()) {
+              link.classList.add("active");
+            }
+          });
+        }
       }
+      lazyLoadImages();
       window.scrollTo({ top: 0, behavior: "smooth" });
       return false;
     }
     
-    // Toggle sidebar for small screens
+    // Toggle sidebar visibility
     function toggleMenu() {
       const sidebar = document.getElementById("sidebar");
-      const content = document.getElementById("main-content");
       sidebar.classList.toggle("open");
-      content.classList.toggle("shift");
     }
     
     // Open photography modal
     function openModal(src) {
       const modal = document.getElementById("photoModal");
       modal.style.display = "flex";
-      modal.querySelector("img").src = src;
+      const modalImg = modal.querySelector("img");
+      modalImg.dataset.src = src;
+      lazyLoadImages();
     }
-    
-    // Close photography modal
     function closeModal() {
       document.getElementById("photoModal").style.display = "none";
     }
     
-    // Search function: searches descriptions and titles
+    // Search function with per-element description
     function doSearch() {
       let query = document.getElementById("searchInput").value.trim();
       if (!query) {
@@ -529,12 +745,11 @@
       for (let key in categoryData) {
         if (Array.isArray(categoryData[key]) && key !== "photography" && key !== "contact") {
           let title = getDisplayTitle(key);
-          let desc = "This is an extended sample description for " + title + ". Enjoy the vibrant display and explore more details.";
-          if (desc.toLowerCase().indexOf(query) !== -1 || title.toLowerCase().indexOf(query) !== -1) {
-            categoryData[key].forEach(item => {
-              results.push({ img: item.img, link: item.link, title: title });
-            });
-          }
+          categoryData[key].forEach(item => {
+            if ((item.desc && item.desc.toLowerCase().includes(query)) || title.toLowerCase().includes(query)) {
+              results.push({ img: item.img, link: item.link, title: title, desc: item.desc });
+            }
+          });
         }
       }
       loadContent("search", { results: results, query: query });
@@ -544,6 +759,12 @@
     document.getElementById("searchInput").addEventListener("keyup", function(event) {
       if (event.key === "Enter") { doSearch(); }
     });
+    
+    // Function to update homeMode and reload home page content
+    function setHomeMode(mode) {
+      homeMode = mode;
+      loadContent("home", document.getElementById("home-link"));
+    }
     
     // Load home content by default
     loadContent("home", document.getElementById("home-link"));

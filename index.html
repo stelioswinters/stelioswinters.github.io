@@ -8,13 +8,11 @@
     :root {
       --bg: #0f0f0f;
       --hover: #333;
-      /* Sidebar active styles */
       --sidebar-active-bg: #444;
       --sidebar-active-border: #fff;
       --burger-bg: rgba(80,80,80,0.5);
       --burger-hover: rgba(80,80,80,0.8);
-      --font-color: #fff;  /* used for general text; your snowflake emoji is here */
-      /* Bright teal from your snowflake */
+      --font-color: #fff;  
       --bright-teal: #1abc9c;
       --bright-teal-dark: #16a085;
     }
@@ -25,7 +23,6 @@
       background: var(--bg);
       color: var(--font-color);
     }
-    /* Burger Menu */
     .menu-toggle {
       display: block;
       position: fixed;
@@ -43,7 +40,6 @@
       user-select: none;
     }
     .menu-toggle:hover { background: var(--burger-hover); }
-    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0;
@@ -59,7 +55,6 @@
       user-select: none;
     }
     .sidebar.open { transform: translateX(0); }
-    /* Sidebar Header */
     .sidebar-header {
       position: absolute;
       top: 0;
@@ -93,7 +88,6 @@
       margin-left: -0.2em;
       letter-spacing: -0.1em;
     }
-    /* Sidebar Links */
     .sidebar a {
       display: block;
       color: var(--font-color);
@@ -113,7 +107,6 @@
       border-right: 4px solid var(--sidebar-active-border);
     }
     .sidebar a.active:hover { background: var(--sidebar-active-bg); }
-    /* Search Container */
     .search-container {
       display: flex;
       align-items: center;
@@ -154,7 +147,6 @@
       fill: none;
       user-select: none;
     }
-    /* Main Content */
     .content {
       margin-left: 0;
       padding: 20px;
@@ -163,7 +155,6 @@
       user-select: none;
     }
     .sidebar.open + .content { margin-left: 200px; }
-    /* Home Title Tabs */
     .home-title-tabs {
       display: inline-flex;
       gap: 20px;
@@ -181,7 +172,6 @@
     }
     .home-title-tabs .tab.active { border-bottom: 4px solid #fff; }
     .home-title-tabs .tab:hover:not(.active) { border-bottom: 4px solid #bbb; }
-    /* Grid Layout */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -207,7 +197,6 @@
       background: var(--bg);
       user-select: none;
     }
-    /* Lazy-Loaded Images with Faster Fade-in */
     img.lazy {
       opacity: 0;
       visibility: hidden;
@@ -219,7 +208,6 @@
       opacity: 1;
       visibility: visible;
     }
-    /* Tooltip on hover */
     .thumb {
       position: relative;
       display: inline-block;
@@ -243,7 +231,6 @@
       user-select: none;
     }
     .thumb:hover .desc { display: flex; }
-    /* Contact Form */
     .contact-form {
       margin-top: 40px;
       width: 50%;
@@ -275,7 +262,6 @@
       user-select: none;
     }
     .contact-form button:hover { background: var(--burger-hover); }
-    /* Back-to-Top Button */
     #backToTop {
       display: none;
       position: fixed;
@@ -295,7 +281,6 @@
     }
     #backToTop:hover { background: #555; }
     .arrow-up { display: inline-block; transform: rotate(-90deg); user-select: none; }
-    /* Photography Modal */
     #photoModal {
       display: none;
       position: fixed;
@@ -325,7 +310,6 @@
       z-index: 410;
       user-select: none;
     }
-    /* Category Titles & Sections */
     .category-title {
       font-size: 1.4em;
       margin: 0 0 10px;
@@ -341,7 +325,6 @@
       align-items: center;
       gap: 10px;
     }
-    /* View All Button (small, next to non-clickable title) */
     .view-all-button {
       background: var(--bg);
       color: var(--bright-teal);
@@ -360,17 +343,14 @@
   </style>
 </head>
 <body>
-  <!-- Burger Menu -->
   <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
   
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <button class="site-title-button" onclick="return loadContent('home', this);" tabindex="-1">
         <span class="emoji">❄️</span><span class="sw">SW</span>
       </button>
     </div>
-    <!-- Search Bar -->
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search..." autofocus>
       <button onclick="doSearch()">
@@ -379,7 +359,6 @@
         </svg>
       </button>
     </div>
-    <!-- Sidebar Category Links -->
     <a href="#" id="home-link" onclick="return loadContent('home', this);">Home</a>
     <a href="#" onclick="return loadContent('toppicks', this);">Top Picks</a>
     <a href="#" onclick="return loadContent('series', this);">Series</a>
@@ -393,9 +372,7 @@
     <a href="#" onclick="return loadContent('contact', this);">Contact</a>
   </div>
   
-  <!-- Main Content Area -->
   <div class="content" id="main-content">
-    <!-- Home page: main title with inline mode tabs -->
     <h4 class="category-title">
       <span class="home-title-tabs">
         <span class="tab" id="tab-latest" onclick="setHomeMode('latest')">Latest</span>
@@ -403,26 +380,20 @@
         <span class="tab" id="tab-random" onclick="setHomeMode('random')">Random</span>
       </span>
     </h4>
-    <!-- Sub-category sections will be rendered here dynamically -->
   </div>
   
-  <!-- Back-to-Top Button -->
   <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
   
-  <!-- Photography Modal Popup -->
   <div id="photoModal" onclick="if(event.target === this){ closeModal(); }">
     <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="" alt="Full Size" class="lazy">
   </div>
   
   <script>
-    // Global variable for home mode (latest, oldest, or random)
     let homeMode = "latest";
     
-    // Custom order for home sub-categories
     const homeOrder = ["youtube", "videogames", "music", "series", "toppicks", "books", "store", "services"];
     
-    // Utility: Get N random items from an array
     function getRandomItems(arr, n) {
       let result = [];
       let taken = [];
@@ -437,7 +408,6 @@
       return result;
     }
     
-    // Lazy load images with fade-in effect using Intersection Observer
     function lazyLoadImages() {
       const lazyImages = document.querySelectorAll("img.lazy:not(.loaded)");
       const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -453,7 +423,6 @@
       lazyImages.forEach(img => imageObserver.observe(img));
     }
     
-    // Show or hide the back-to-top button
     window.onscroll = function() {
       document.getElementById("backToTop").style.display =
         (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
@@ -462,7 +431,6 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
     
-    // Returns display title for a category
     function getDisplayTitle(cat) {
       if (cat === "toppicks") return "Top Picks";
       if (cat === "videogames") return "Video Games";
@@ -471,7 +439,6 @@
       return cat.charAt(0).toUpperCase() + cat.slice(1);
     }
     
-    // Adjust sidebar based on content height
     function adjustSidebar() {
       const sidebar = document.getElementById("sidebar");
       if (sidebar.scrollHeight <= window.innerHeight) {
@@ -483,14 +450,12 @@
     window.addEventListener("load", adjustSidebar);
     window.addEventListener("resize", adjustSidebar);
     
-    // Extra items arrays for other categories (if needed)
     const extraToppicks = [];
     const extraMusic = [];
     const extraVideogames = [];
     const extraBooks = [];
     const extraServices = [];
     
-    // Generate photography items
     const photographyData = [];
     for (let i = 1; i <= 19; i++) {
       photographyData.push({
@@ -500,10 +465,8 @@
       });
     }
     
-    // --- YouTube Section --- 
-    // Create a placeholder list (in reversed order) so that the YouTube section loads immediately.
     const youtubeVideoIds = [
-      "x4Bv72eAEzI", "xbIhyb2kI1U", "XN4hiDQT77k", "qsZBJH2ev9w", "mt3DlxYbuN8", "orzLvvF8Bbs", "zfAoAdV0WUs",
+      "X69QujXQFug", "x4Bv72eAEzI", "xbIhyb2kI1U", "XN4hiDQT77k", "qsZBJH2ev9w", "mt3DlxYbuN8", "orzLvvF8Bbs", "zfAoAdV0WUs",
       "4_0SsReFHFA", "dsIhBWBlyVE", "uFuE-JF8Y64", "tUdWIvIdhT0", "U0lTN1JwgyY", "KCx0UVWEPQw",
       "9Se2icjFzIE", "UIrjdLGZHpo", "JfxevioMFT4", "eXpIe4Z4npw", "feFS70kQG20", "6jPgXFeSlaM",
       "78-EsIm0Q-E", "JDcz12_gYOA", "gk9ulqfKVFU", "3S2Fr4YU9iU", "aRI2IR98Hh8", "jKt1caBdf80",
@@ -529,18 +492,15 @@
       "n_zFJ_D-U-c", "iGz8Y8QyMJY", "NhRjWJEKiw0", "OXQh-jzT8T8", "6q8bUW4veHE", "7Z5Fj1KtHsI",
       "MOJfMPanjZc", "ZfEZQVLGJWk", "jTCygSOOp6A", "72qmtr41iWU", "Q27FodNGKGw", "wFawF4eDGJo",
       "iyK_9bQH5vw", "p1TPs00c1W8", "WzxRMBlwG_k", "Y4PMBqHRHFY", "Xx49tSC_KHc", "g_0_yaX6BQo",
-      "A75aWr1M2e0", "xb8_RpDUBr0", "28p4_TX7XrY", "cMqKztorZMU","X69QujXQFug"
+      "A75aWr1M2e0", "xb8_RpDUBr0", "28p4_TX7XrY", "cMqKztorZMU"
     ];
     
-    // Create placeholder YouTube objects in reversed order so the section loads immediately.
-    // (These are not used directly in the rendered page; they will be replaced once the oEmbed API returns the video titles.)
     let placeholderYouTube = youtubeVideoIds.slice().reverse().map(id => ({
       img: `https://img.youtube.com/vi/${id}/0.jpg`,
       link: `https://www.youtube.com/watch?v=${id}`,
       desc: "Loading title..."
     }));
     
-    // Main category data object – note the changes in the "toppicks" array:
     const categoryData = {
       toppicks: [
         { img: "https://img.youtube.com/vi/pW3F35-aaP4/mqdefault.jpg", link: "https://www.youtube.com/watch?v=pW3F35-aaP4", desc: "Human Food - Claymation AI Movie" },
@@ -572,7 +532,6 @@
         { img: "https://i.ytimg.com/vi/XYmmwZGLpxQ/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGngaymuJ6VaIlEJr5Xowkrh", desc: "Inventions" },
         { img: "https://i.ytimg.com/vi/FPqD8OZ0nAo/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGnfn29DGPl_S-VzaPwbMyYH", desc: "Evolution" }
       ],
-      // The YouTube category uses the placeholder – it will update after fetching.
       youtube: placeholderYouTube,
       videogames: [
         { img: "https://img.itch.zone/aW1nLzIyMjc2NzgucG5n/315x250%23c/yBf5ev.png", link: "https://stelioswinters.itch.io/cyclomadron", desc: "Amazing platformer with many different styles of gameplay" },
@@ -624,7 +583,6 @@
       photography: photographyData,
     };
     
-    // Load content based on category
     function loadContent(cat, el) {
       let html = "";
       if (cat === "home") {
@@ -711,7 +669,6 @@
         html += `</div>`;
       }
       document.getElementById("main-content").innerHTML = html;
-      // Update active sidebar link
       document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
       if (el && el.tagName) {
         if (el.closest(".sidebar")) {
@@ -729,12 +686,10 @@
       return false;
     }
     
-    // Toggle sidebar visibility
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("open");
     }
     
-    // Open photography modal
     function openModal(src) {
       const modal = document.getElementById("photoModal");
       modal.style.display = "flex";
@@ -746,7 +701,6 @@
       document.getElementById("photoModal").style.display = "none";
     }
     
-    // Search function
     function doSearch() {
       let query = document.getElementById("searchInput").value.trim();
       if (!query) {
@@ -771,17 +725,13 @@
       if (event.key === "Enter") { doSearch(); }
     });
     
-    // Update home mode
     function setHomeMode(mode) {
       homeMode = mode;
       loadContent("home", document.getElementById("home-link"));
     }
     
-    // Load home content by default (now with the placeholder YouTube section already in categoryData)
     loadContent("home", document.getElementById("home-link"));
     
-    // --- Dynamic YouTube Videos Section ---
-    // Fetch each video's title using the YouTube oEmbed API (in reversed order) and update the YouTube category.
     function populateYouTubeVideos() {
       const reversedIds = youtubeVideoIds.slice().reverse();
       const promises = reversedIds.map(id =>
@@ -803,12 +753,10 @@
       );
       Promise.all(promises).then(results => {
         categoryData.youtube = results;
-        // If YouTube section is currently active, refresh the view.
         const activeLink = document.querySelector(".sidebar a.active");
         if (activeLink && activeLink.textContent.trim().toLowerCase() === "youtube") {
           loadContent("youtube", activeLink);
         } else {
-          // Also refresh Home if youtube is part of the Home tabs.
           loadContent("home", document.getElementById("home-link"));
         }
       });

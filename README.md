@@ -1,4 +1,7 @@
 ---
+---
+
+---
 # Stelios Winters – Multimedia Creator & Digital Entrepreneur
 
 Welcome to the official GitHub repository of **Stelios Winters**. This repository contains information about my creative work, digital projects, and multimedia ecosystem.

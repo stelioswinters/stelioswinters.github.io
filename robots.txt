@@ -1,5 +1,5 @@
 # --------------------------------------
-# 1. Search engines allowed
+# 1. Allow major search engines
 # --------------------------------------
 User-agent: Googlebot
 Allow: /
@@ -41,7 +41,7 @@ User-agent: AI*
 Disallow: /
 
 # --------------------------------------
-# 3. Protect sensitive paths / files
+# 3. Protect sensitive folders/files
 # --------------------------------------
 Disallow: /admin/
 Disallow: /config/
@@ -53,18 +53,18 @@ Disallow: /tmp/
 Disallow: /test/
 
 # --------------------------------------
-# 4. Optional: Block duplicate content
+# 4. Optional: Prevent duplicate parameters
 # --------------------------------------
 Disallow: /?*session=
 Disallow: /*?utm_=
 Disallow: /*?ref=
 
 # --------------------------------------
-# 5. Optional: Sitemap
+# 5. Sitemap (single-page version)
 # --------------------------------------
 Sitemap: https://stelioswinters.com/sitemap.xml
 
 # --------------------------------------
-# 6. Crawl delay to reduce server load
+# 6. Crawl-delay to reduce server load
 # --------------------------------------
 Crawl-delay: 10

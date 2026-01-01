@@ -98,7 +98,7 @@ Audience includes gamers, YouTube viewers, music fans, readers, digital artists,
 
 ## JSON-LD Structured Data for SEO
 
-```html
+html
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -119,8 +119,8 @@ Audience includes gamers, YouTube viewers, music fans, readers, digital artists,
   "description": "Stelios Winters is a multi-disciplinary multimedia creator, musician, indie game developer, writer, and digital media designer producing content across YouTube, games, music platforms, books, and tutorials with a focus on creativity, education, and interactivity."
 }
 </script>
-```
+
 
 ---
 
-*This README is optimized for search engines using key roles, projects, and structured content. Humans can expand sections to view detailed information, while search engines index all text content for discoverability.*
+*This README is optimized for search engines using key roles, projects, and structured content. People can expand sections to view detailed information, while search engines index all text content for discoverability.*

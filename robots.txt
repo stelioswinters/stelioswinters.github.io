@@ -37,12 +37,10 @@ Disallow: /
 User-agent: LLaMA
 Disallow: /
 
-User-agent: AI*
-Disallow: /
-
 # --------------------------------------
 # 3. Protect sensitive folders/files
 # --------------------------------------
+User-agent: *
 Disallow: /admin/
 Disallow: /config/
 Disallow: /.git/
@@ -53,18 +51,13 @@ Disallow: /tmp/
 Disallow: /test/
 
 # --------------------------------------
-# 4. Optional: Prevent duplicate parameters
+# 4. Prevent duplicate parameters
 # --------------------------------------
 Disallow: /?*session=
 Disallow: /*?utm_=
 Disallow: /*?ref=
 
 # --------------------------------------
-# 5. Sitemap (single-page version)
+# 5. Sitemap
 # --------------------------------------
 Sitemap: https://stelioswinters.com/sitemap.xml
-
-# --------------------------------------
-# 6. Crawl-delay to reduce server load
-# --------------------------------------
-Crawl-delay: 10

@@ -1,7 +1,6 @@
 ---
 ---
 
----
 # Stelios Winters – Multimedia Creator & Digital Entrepreneur
 
 Welcome to the official GitHub repository of **Stelios Winters**. This repository contains information about my creative work, digital projects, and multimedia ecosystem.
@@ -87,15 +86,20 @@ Audience includes gamers, YouTube viewers, music fans, readers, digital artists,
 <details>
 <summary>Click to expand – Contact info & platforms</summary>
 
-- Personal website: [https://stelioswinters.com](https://stelioswinters.com)
-- Static website: [https://stelioswinters.github.io](https://stelioswinters.github.io) 
+- Personal website: [https://stelioswinters.com](https://stelioswinters.com)  
+- Static website: [https://stelioswinters.github.io](https://stelioswinters.github.io)  
 - YouTube: [STELELE](https://www.youtube.com/@STELELE)  
 - Music & indie projects: [https://stelioswinters.itch.io](https://stelioswinters.itch.io)  
 - Email (contact form via website)  
 
 </details>
 
+---
+
 ## JSON-LD Structured Data for SEO
+
+<details>
+<summary>Click to expand – JSON-LD for search engines</summary>
 
 <script type="application/ld+json">
 {
@@ -117,6 +121,8 @@ Audience includes gamers, YouTube viewers, music fans, readers, digital artists,
   "description": "Stelios Winters is a multi-disciplinary multimedia creator, musician, indie game developer, writer, and digital media designer producing content across YouTube, games, music platforms, books, and tutorials with a focus on creativity, education, and interactivity."
 }
 </script>
+
+</details>
 
 ---
 

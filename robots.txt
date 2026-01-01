@@ -1,0 +1,70 @@
+# --------------------------------------
+# 1. Search engines allowed
+# --------------------------------------
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# --------------------------------------
+# 2. Block known AI training bots
+# --------------------------------------
+User-agent: OpenAI
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Anthropic
+Disallow: /
+
+User-agent: HuggingFace
+Disallow: /
+
+User-agent: LLaMA
+Disallow: /
+
+User-agent: AI*
+Disallow: /
+
+# --------------------------------------
+# 3. Protect sensitive paths / files
+# --------------------------------------
+Disallow: /admin/
+Disallow: /config/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /node_modules/
+Disallow: /scripts/
+Disallow: /tmp/
+Disallow: /test/
+
+# --------------------------------------
+# 4. Optional: Block duplicate content
+# --------------------------------------
+Disallow: /?*session=
+Disallow: /*?utm_=
+Disallow: /*?ref=
+
+# --------------------------------------
+# 5. Optional: Sitemap
+# --------------------------------------
+Sitemap: https://stelioswinters.com/sitemap.xml
+
+# --------------------------------------
+# 6. Crawl delay to reduce server load
+# --------------------------------------
+Crawl-delay: 10

@@ -826,7 +826,7 @@
       } else if (cat === "art") {
         html += `<h4 class="category-title">Art</h4><div class="grid">`;
         categoryData[cat].slice().reverse().forEach(item => {
-          html += `<div class="photo" onclick="openModal('${item.img}')">
+          html += `<div class="photo" onclick="openModal(\"${item.img}\")">
                      <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="Art" class="lazy">
                      <span class="desc">${item.desc || 'Art image'}</span>
                    </div>`;

@@ -123,7 +123,7 @@
       color: var(--font-color);
     }
     .about-stelios-winters h3 {
-    margin-top: 3rem;
+      margin-top: 3rem;
     }
     .search-container button {
       width: 40px;
@@ -344,35 +344,14 @@
       background: var(--bright-teal);
       color: var(--bg);
     }
-    ::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--bg);
-  border-radius: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-/* For Firefox */
-* {
-  scrollbar-color: var(--bg) var(--bg);
-  scrollbar-width: thin;
-}
-  
-    .home-grid {
-      overflow: hidden;
-      position: relative;
-    }
-    .slide {
-      animation: slideIn 0.35s ease;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-</style>
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-thumb { background: var(--bg); border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    * { scrollbar-color: var(--bg) var(--bg); scrollbar-width: thin; }
+    .home-grid { overflow: hidden; position: relative; }
+    .slide { animation: slideIn 0.35s ease; }
+    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
 </head>
 <body>
   <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
@@ -399,7 +378,7 @@
     <a href="#" onclick="return loadContent('music', this);">Music</a>
     <a href="#" onclick="return loadContent('books', this);">Books</a>
     <a href="#" onclick="return loadContent('store', this);">Store</a>
-        <a href="#" onclick="return loadContent('art', this);">Art</a>
+    <a href="#" onclick="return loadContent('art', this);">Art</a>
     <a href="#" onclick="return loadContent('services', this);">Services</a>
     <a href="#" onclick="return loadContent('contact', this);">Contact</a>
     <a href="#" onclick="return loadContent('about', this);">About</a>
@@ -413,6 +392,9 @@
         <span class="tab" id="tab-random" onclick="setHomeMode('random')">Random</span>
       </span>
     </h4>
+
+    <!-- Art container -->
+    <div id="art-container" class="grid home-grid"></div>
   </div>
   
   <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
@@ -421,7 +403,7 @@
     <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="" alt="Full Size" class="lazy">
   </div>
-  
+
   <script>
     let homeMode = "latest";
 
@@ -541,31 +523,39 @@
 <div id="art-container"></div>
 
 <script>
-const artData = [
-  {
-    img: "https://ih1.redbubble.net/image.6038082908.8059/flat,600x600,075,f.jpg",
-    title: "Bless",
-    link: "https://www.redbubble.com/shop/ap/177228059"
-  },
-  {
-    img: "https://ih1.redbubble.net/image.6038082908.8059/flat,600x600,075,f.jpg",
-    title: "Bleeeess",
-    link: "https://www.redbubble.com/shop/ap/177228059"
-  },
+    const artContainer = [ document.getElementById("art-container");
+
+    artData.forEach(art => {
+      const artCard = document.createElement("a");
+      artCard.href = art.link;
+      artCard.target = "_blank";
+      artCard.className = "thumb";
+      artCard.style.textAlign = "center";
+
+      const img = document.createElement("img");
+      img.src = art.img;
+      img.alt = art.title;
+      img.draggable = false;
+      img.oncontextmenu = e => e.preventDefault();
+      img.style.width = "200px";
+      img.style.height = "200px";
+      img.style.objectFit = "cover";
+      img.style.pointerEvents = "none";
+
+      const title = document.createElement("div");
+      title.textContent = art.title;
+      title.style.marginTop = "5px";
+      title.style.fontWeight = "bold";
+
+      artCard.appendChild(img);
+      artCard.appendChild(title);
+      artContainer.appendChild(artCard);
+    });
+
+    // Lazy-load art images
+    lazyLoadImages();
+  </script>
 ];
-
-const container = document.getElementById("art-container");
-
-artData.forEach(art => {
-  container.innerHTML += `
-    <a href="${art.link}" target="_blank" style="text-align:center; display:inline-block; margin:10px; text-decoration:none; color:black;">
-      <img src="${art.img}" alt="${art.title}" draggable="false" oncontextmenu="return false;" style="width:200px; height:200px; object-fit:cover; pointer-events:none;">
-      <div style="margin-top:5px; font-weight:bold;">${art.title}</div>
-    </a>
-  `;
-});
-</script>
-
     
     const youtubeVideoIds = [
       "YFqLjY4heFY" , "ud8MGgGEyig" , "PUPQ0AIzwT8" , "hJkBVrGHB-M" , "hVRZv61hy-s" , "HRyvS2vJdSs" , "czKhxwO5g1E" , "lMsBoMVeJIg" , "uF2JZux71po" , "qD-s3tx_cls" , "7w2ochUNyes" , "k_0yWYEhT4o" , "dyiyiBeS6Kw" , "LbWphM9ULjY" , "jbNZQr_2Apk" , "TviCUaGfwG4" ,

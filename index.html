@@ -1,39 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stelios Winters</title>
 
-<title>Stelios Winters – Art & Creative Work</title>
-<meta name="description" content="Official site of Stelios Winters. Original artwork, creative projects, and media.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
 
-<style>
-:root{
-  --bg:#0f0f0f;
-  --panel:#171717;
-  --text:#ffffff;
-  --muted:#aaaaaa;
-  --accent:#1abc9c;
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --hover: #333;
+      --sidebar-active-bg: #444;
+      --sidebar-active-border: #fff;
+      --burger-bg: rgba(80,80,80,0.5);
+      --burger-hover: rgba(80,80,80,0.8);
+      --font-color: #fff;  
+      --bright-teal: #1abc9c;
+      --bright-teal-dark: #16a085;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--font-color);
+    }
+
+    /* RESPONSIVE TEXT SCALING (minimal, safe) */
+    .home-title-tabs .tab {
+      font-size: clamp(14px, 3.5vw, 18px);
+    }
+
+    .contact-form input,
+    .contact-form textarea,
+    .contact-form button {
+      font-size: clamp(14px, 3.5vw, 20px);
+    }
+
+    .category-title {
+      font-size: clamp(1.1em, 4vw, 1.4em);
+    }
+
+    /* MENU BUTTON */
+    .menu-toggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      background: var(--burger-bg);
+      color: var(--font-color);
+      border: none;
+      padding: 10px;
+      z-index: 300;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 100%;
+      background: var(--bg);
+      padding: 60px 15px 10px 10px;
+      overflow-y: auto;
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar a {
+      display: block;
+      color: var(--font-color);
+      text-decoration: none;
+      padding: 8px 10px;
+      font-size: 18px;
+    }
+
+    .sidebar a.active {
+      background: var(--sidebar-active-bg);
+      border-right: 4px solid var(--sidebar-active-border);
+      font-weight: bold;
+    }
+
+    /* CONTENT */
+    .content {
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    img.lazy {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    img.lazy.loaded {
+      opacity: 1;
+    }
+
+    /* ART FIX — REMOVE BLACK BACKGROUND */
+    .photo,
+    .photo img {
+      background: transparent !important;
+    }
+
+    #photoModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 500;
+    }
+
+    #photoModal img {
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    #photoModal .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+<div class="sidebar" id="sidebar">
+  <a href="#" id="home-link" onclick="return loadContent('home', this)">Home</a>
+  <a href="#" onclick="return loadContent('art', this)">Art</a>
+</div>
+
+<div class="content" id="main-content"></div>
+
+<div id="photoModal" onclick="if(event.target===this)closeModal()">
+  <span class="close" onclick="closeModal()">×</span>
+  <img class="lazy" data-src="">
+</div>
+
+<script>
+/* SAFE LAZY LOAD */
+function lazyLoadImages() {
+  document.querySelectorAll("img.lazy:not(.loaded)").forEach(img => {
+    img.src = img.dataset.src;
+    img.onload = () => img.classList.add("loaded");
+  });
 }
 
-/* RESET */
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
+/* ART DATA — EASY TO ADD MORE */
+const artData = [
+  {
+    img: "https://ih1.redbubble.net/image.6038082908.8059/flat,600x600,075,f.jpg",
+    desc: "Original artwork"
+  }
+];
+
+function loadContent(cat) {
+  let html = "";
+  if (cat === "art") {
+    html += `<h4 class="category-title">Art</h4><div class="grid">`;
+    artData.forEach(item => {
+      html += `
+        <div class="photo" onclick="openModal('${item.img}')">
+          <img class="lazy" data-src="${item.img}">
+        </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html = `<h4 class="category-title">Home</h4>`;
+  }
+
+  document.getElementById("main-content").innerHTML = html;
+  lazyLoadImages();
+  return false;
 }
 
-/* ACCESSIBILITY */
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important;}
+/* MODAL */
+function openModal(src) {
+  const modal = document.getElementById("photoModal");
+  modal.style.display = "flex";
+  modal.querySelector("img").dataset.src = src;
+  lazyLoadImages();
+}
+function closeModal() {
+  document.getElementById("photoModal").style.display = "none";
 }
 
-/* MENU BUTTON */
-.menu-toggle{
-  position:fixed;
+/* MENU */
+function toggleMenu() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+/* YOUTUBE BUG FIX — FUNCTION COMPLETED SAFELY */
+function populateYouTubeVideos() {
+  if (!window.fetch) return;
+  youtubeVideoIds.forEach(id => {
+    fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
+      .catch(() => null);
+  });
+}
+
+loadContent("home");
+</script>
+
+</body>
+</html>
   top:12px;left:12px;
   padding:10px 14px;
   font-size:22px;

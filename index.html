@@ -538,7 +538,7 @@
     const extraBooks = [];
     const extraServices = [];
     
- <div id="art-container"></div>
+<div id="art-container"></div>
 
 <script>
 const artData = [
@@ -557,55 +557,14 @@ const artData = [
 const container = document.getElementById("art-container");
 
 artData.forEach(art => {
-  const artCard = document.createElement("a");
-  artCard.href = art.link;
-  artCard.target = "_blank"; // opens in a new tab
-  artCard.className = "art-card";
-
-  const img = document.createElement("img");
-  img.src = art.img;
-  img.alt = art.title;
-  img.draggable = false; // prevent dragging
-  img.oncontextmenu = (e) => e.preventDefault(); // prevent right-click
-  artCard.appendChild(img);
-
-  const title = document.createElement("div");
-  title.className = "art-title";
-  title.textContent = art.title;
-  artCard.appendChild(title);
-
-  container.appendChild(artCard);
+  container.innerHTML += `
+    <a href="${art.link}" target="_blank" style="text-align:center; display:inline-block; margin:10px; text-decoration:none; color:black;">
+      <img src="${art.img}" alt="${art.title}" draggable="false" oncontextmenu="return false;" style="width:200px; height:200px; object-fit:cover; pointer-events:none;">
+      <div style="margin-top:5px; font-weight:bold;">${art.title}</div>
+    </a>
+  `;
 });
 </script>
-
-<style>
-#art-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.art-card {
-  display: block;
-  text-align: center;
-  cursor: pointer;
-  text-decoration: none;
-  color: black;
-}
-
-.art-card img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  pointer-events: none; /* disables direct click on image itself */
-  user-select: none;
-}
-
-.art-title {
-  margin-top: 8px;
-  font-weight: bold;
-}
-</style>
 
     
     const youtubeVideoIds = [

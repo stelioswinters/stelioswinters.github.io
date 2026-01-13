@@ -1,1013 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stelios Winters</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
-  <style>
-    :root {
-      --bg: #0f0f0f;
-      --hover: #333;
-      --sidebar-active-bg: #444;
-      --sidebar-active-border: #fff;
-      --burger-bg: rgba(80,80,80,0.5);
-      --burger-hover: rgba(80,80,80,0.8);
-      --font-color: #fff;  
-      --bright-teal: #1abc9c;
-      --bright-teal-dark: #16a085;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--font-color);
-    }
-    .menu-toggle {
-      display: block;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 24px;
-      background: var(--burger-bg);
-      color: var(--font-color);
-      border: none;
-      padding: 10px;
-      z-index: 300;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      border-radius: 10px;
-      user-select: none;
-    }
-    .menu-toggle:hover { background: var(--burger-hover); }
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 200px;
-      height: 100%;
-      background: var(--bg);
-      padding: 60px 15px 10px 10px;
-      overflow-y: auto;
-      z-index: 200;
-      transition: transform 0.3s ease;
-      transform: translateX(-100%);
-      user-select: none;
-    }
-    .sidebar.open { transform: translateX(0); }
-    .sidebar-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 10px;
-      user-select: none;
-    }
-    .site-title-button {
-      background: var(--bg);
-      border: none;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: var(--font-color);
-      cursor: default;
-      user-select: none;
-      transform: translateX(10px);
-    }
-    .site-title-button:focus { outline: none; }
-    .site-title-button .emoji { font-size: 1.5em; }
-    .site-title-button .sw {
-      font-family: Monaco, "Courier New", monospace !important;
-      font-weight: bold;
-      font-size: 1.9em;
-      line-height: 1;
-      margin-left: -0.2em;
-      letter-spacing: -0.1em;
-    }
-    .sidebar a {
-      display: block;
-      color: var(--font-color);
-      text-decoration: none;
-      padding: 8px 10px;
-      margin-bottom: 1px;
-      border-radius: 0;
-      font-size: 18px;
-      background: var(--bg);
-      transition: background 0.3s;
-      user-select: none;
-    }
-    .sidebar a:hover { background: var(--hover); }
-    .sidebar a.active {
-      background: var(--sidebar-active-bg);
-      font-weight: bold;
-      border-right: 4px solid var(--sidebar-active-border);
-    }
-    .sidebar a.active:hover { background: var(--sidebar-active-bg); }
-    .search-container {
-      display: flex;
-      align-items: center;
-      margin: 5px 0;
-    }
-    .search-container input {
-      width: calc(100% - 50px);
-      padding: 5px;
-      border: 1px solid #444;
-      border-radius: 4px;
-      font-size: 16px;
-      background: #303030;
-      color: var(--font-color);
-    }
-    .about-stelios-winters h3 {
-    margin-top: 3rem;
-    }
-    .search-container button {
-      width: 40px;
-      height: 40px;
-      border: none;
-      background: var(--burger-bg);
-      border-radius: 50%;
-      cursor: pointer;
-      margin-left: 10px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      transition: background 0.3s ease;
-      color: var(--font-color);
-      user-select: none;
-    }
-    .search-container button:hover { background: var(--burger-hover); }
-    .search-container button svg {
-      width: 24px;
-      height: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      user-select: none;
-    }
-    .content {
-      margin-left: 0;
-      padding: 20px;
-      background: var(--bg);
-      transition: margin-left 0.3s ease;
-      user-select: none;
-    }
-    .sidebar.open + .content { margin-left: 200px; }
-    .home-title-tabs {
-      display: inline-flex;
-      gap: 20px;
-      align-items: center;
-      margin-bottom: 10px;
-      user-select: none;
-    }
-    .home-title-tabs .tab {
-      cursor: pointer;
-      padding-bottom: 4px;
-      border-bottom: 4px solid transparent;
-      transition: border-bottom 0.3s;
-      border-radius: 0;
-      user-select: none;
-    }
-    .home-title-tabs .tab.active { border-bottom: 4px solid #fff; }
-    .home-title-tabs .tab:hover:not(.active) { border-bottom: 4px solid #bbb; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-      user-select: none;
-    }
-    .grid a, .grid div {
-      display: block;
-      border-radius: 4px;
-      overflow: hidden;
-      background: var(--bg);
-      aspect-ratio: 16/9;
-      position: relative;
-      user-select: none;
-    }
-    .grid img {
-      width: calc(100% - 4px);
-      height: calc(100% - 4px);
-      object-fit: cover;
-      margin: 2px;
-      border-radius: 8px;
-      background: var(--bg);
-      user-select: none;
-    }
-    img.lazy {
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease-out;
-      background: #000 !important;
-      background-image: none !important;
-    }
-    img.lazy.loaded {
-      opacity: 1;
-      visibility: visible;
-    }
-    .thumb {
-      position: relative;
-      display: inline-block;
-      user-select: none;
-    }
-    .thumb .desc {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      color: var(--font-color);
-      font-size: 18px;
-      padding: 10px;
-      box-sizing: border-box;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      user-select: none;
-    }
-    .thumb:hover .desc { display: flex; }
-    .contact-form {
-      margin-top: 40px;
-      width: 50%;
-      user-select: none;
-    }
-    .contact-form label { display: block; margin: 10px 0; user-select: none; }
-    .contact-form input, .contact-form textarea {
-      padding: 2px;
-      background: #303030;
-      border: 1px solid #444;
-      color: var(--font-color);
-      border-radius: 4px;
-      margin-bottom: 10px;
-      font-size: 20px;
-      user-select: none;
-    }
-    .contact-form input[type="email"],
-    .contact-form input[type="text"] { width: 50%; }
-    .contact-form textarea { width: 100%; height: 160px; }
-    .contact-form button {
-      background: var(--burger-bg);
-      color: var(--font-color);
-      border: none;
-      padding: 12px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
-      font-size: 16px;
-      user-select: none;
-    }
-    .contact-form button:hover { background: var(--burger-hover); }
-    #backToTop {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #333;
-      color: var(--font-color);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-      cursor: pointer;
-      transition: background 0.3s;
-      z-index: 300;
-      user-select: none;
-    }
-    #backToTop:hover { background: #555; }
-    .arrow-up { display: inline-block; transform: rotate(-90deg); user-select: none; }
-    #photoModal {
-      display: none;
-      position: fixed;
-      z-index: 400;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-    }
-    #photoModal img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 4px;
-      user-select: none;
-    }
-    #photoModal .close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 40px;
-      color: var(--font-color);
-      cursor: pointer;
-      z-index: 410;
-      user-select: none;
-    }
-    .category-title {
-      font-size: 1.4em;
-      margin: 0 0 10px;
-      user-select: none;
-    }
-    .category-section { margin-bottom: 40px; user-select: none; }
-    .category-name {
-      font-size: 0.9em;
-      margin: 0 0 5px;
-      color: var(--font-color);
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .view-all-button {
-      background: var(--bg);
-      color: var(--bright-teal);
-      border: 1px solid var(--bright-teal-dark);
-      padding: 4px 6px;
-      font-size: 0.65em;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .view-all-button:hover {
-      background: var(--bright-teal);
-      color: var(--bg);
-    }
-    ::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--bg);
-  border-radius: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-/* For Firefox */
-* {
-  scrollbar-color: var(--bg) var(--bg);
-  scrollbar-width: thin;
-}
-  
-    .home-grid {
-      overflow: hidden;
-      position: relative;
-    }
-    .slide {
-      animation: slideIn 0.35s ease;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<title>Stelios Winters – Art, Films, Ideas</title>
+<meta name="description" content="Official site of Stelios Winters. Original art, films, series, and creative projects." />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
+
+<style>
+:root {
+  --bg:#0f0f0f;
+  --panel:#161616;
+  --text:#ffffff;
+  --muted:#aaaaaa;
+  --accent:#1abc9c;
+}
+
+/* RESET */
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:100%; height:100%; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* MOTION SAFETY */
+@media (prefers-reduced-motion: reduce) {
+  * { animation:none !important; transition:none !important; }
+}
+
+/* MENU */
+.menu-toggle {
+  position:fixed; top:12px; left:12px;
+  background:rgba(255,255,255,0.08);
+  border:none; color:var(--text);
+  padding:10px 14px;
+  font-size:22px;
+  border-radius:12px;
+  cursor:pointer;
+  z-index:1000;
+  backdrop-filter: blur(8px);
+  transition: background 0.3s;
+}
+.menu-toggle:hover { background:rgba(255,255,255,0.15); }
+
+/* SIDEBAR */
+.sidebar {
+  position:fixed;
+  top:0; left:0;
+  width:240px; height:100%;
+  background:var(--panel);
+  padding-top:70px;
+  transform:translateX(-260px);
+  transition:transform 0.45s cubic-bezier(.4,0,.2,1);
+  z-index:900;
+}
+.sidebar.open { transform:translateX(0); }
+
+.sidebar a {
+  display:block;
+  padding:12px 20px;
+  text-decoration:none;
+  color:var(--text);
+  font-size:17px;
+  opacity:0.85;
+  transition: background 0.3s, opacity 0.3s;
+}
+.sidebar a:hover { background:#222; opacity:1; }
+.sidebar a.active { opacity:1; background:#1e1e1e; }
+
+/* CONTENT */
+.content {
+  padding:70px 20px 40px;
+  max-width:1200px;
+  margin:auto;
+  animation: fadeIn 0.6s ease;
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:none; }
+}
+
+/* TABS */
+.tab-container {
+  display:flex;
+  gap:20px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.tab {
+  cursor:pointer;
+  padding-bottom:4px;
+  border-bottom:2px solid transparent;
+  opacity:0.7;
+  transition:0.3s;
+}
+.tab.active { border-color:#fff; opacity:1; }
+
+/* HEADERS */
+.category-title {
+  margin:30px 0 12px;
+  font-size:1.7rem;
+  font-weight:600;
+  letter-spacing:0.5px;
+}
+
+/* GRID */
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+  gap:12px;
+}
+.grid a {
+  display:block;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  background:#000;
+  transform: translateY(8px);
+  opacity:0;
+  animation: gridIn 0.6s forwards;
+}
+.grid a:nth-child(n) { animation-delay: calc(var(--i) * 60ms); }
+
+@keyframes gridIn {
+  to { transform:none; opacity:1; }
+}
+
+.grid img {
+  width:100%; height:100%;
+  object-fit:cover;
+  aspect-ratio:16/9;
+  transition: transform 0.4s, filter 0.4s;
+}
+.grid a:hover img {
+  transform:scale(1.05);
+  filter:brightness(1.1);
+}
+
+/* CONTACT */
+.contact-form {
+  max-width:480px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.contact-form input,
+.contact-form textarea {
+  background:#222;
+  border:1px solid #333;
+  padding:10px;
+  border-radius:8px;
+  color:var(--text);
+}
+.contact-form button {
+  background:var(--accent);
+  color:#000;
+  border:none;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+/* MOBILE */
+@media (max-width:600px) {
+  .sidebar { width:210px; }
+  .category-title { font-size:1.4rem; }
+}
 </style>
 </head>
+
 <body>
-  <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
-  
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <button class="site-title-button" onclick="return loadContent('home', this);" tabindex="-1">
-        <span class="emoji">❄️</span><span class="sw">SW</span>
-      </button>
-    </div>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search..." autofocus>
-      <button onclick="doSearch()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <path fill="#fff" d="M505 442.7L405.3 343c28.4-34.9 45.7-79 45.7-127C451 96.5 354.5 0 225.5 0S0 96.5 0 216s96.5 216 225.5 216c34.6 0 65.8-10.4 103-34.7l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l22.7-22.7c9.4-9.4 9.4-24.6.1-34zM225.5 360c-77 0-139-62-139-139S148.5 82 225.5 82s139 62 139 139-62 139-139 139z"/>
-        </svg>
-      </button>
-    </div>
-    <a href="#" id="home-link" onclick="return loadContent('home', this);">Home</a>
-    <a href="#" onclick="return loadContent('toppicks', this);">Top Picks</a>
-    <a href="#" onclick="return loadContent('series', this);">Series</a>
-    <a href="#" onclick="return loadContent('youtube', this);">YouTube</a>
-    <a href="#" onclick="return loadContent('videogames', this);">Video Games</a>
-    <a href="#" onclick="return loadContent('music', this);">Music</a>
-    <a href="#" onclick="return loadContent('books', this);">Books</a>
-    <a href="#" onclick="return loadContent('store', this);">Store</a>
-        <a href="#" onclick="return loadContent('art', this);">Art</a>
-    <a href="#" onclick="return loadContent('services', this);">Services</a>
-    <a href="#" onclick="return loadContent('contact', this);">Contact</a>
-    <a href="#" onclick="return loadContent('about', this);">About</a>
-  </div>
-  
-  <div class="content" id="main-content">
-    <h4 class="category-title">
-      <span class="home-title-tabs">
-        <span class="tab" id="tab-latest" onclick="setHomeMode('latest')">Latest</span>
-        <span class="tab" id="tab-oldest" onclick="setHomeMode('oldest')">Oldest</span>
-        <span class="tab" id="tab-random" onclick="setHomeMode('random')">Random</span>
-      </span>
-    </h4>
-  </div>
-  
-  <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
-  
-  <div id="photoModal" onclick="if(event.target === this){ closeModal(); }">
-    <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
-    <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="" alt="Full Size" class="lazy">
-  </div>
-  
-  <script>
-    let homeMode = "latest";
 
-    const homePageIndex = {};
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-    function renderHomeCategory(key) {
-      const container = document.getElementById("home-grid-" + key);
-      if (!container) return;
+<nav class="sidebar" id="sidebar">
+  <a href="#" onclick="return loadContent('home',this)" id="link-home">Home</a>
+  <a href="#" onclick="return loadContent('art',this)">Art</a>
+  <a href="#" onclick="return loadContent('youtube',this)">YouTube</a>
+  <a href="#" onclick="return loadContent('music',this)">Music</a>
+  <a href="#" onclick="return loadContent('books',this)">Books</a>
+  <a href="#" onclick="return loadContent('contact',this)">Contact</a>
+</nav>
 
-      const items = categoryData[key];
-      if (!homePageIndex[key]) homePageIndex[key] = 0;
+<main class="content" id="main-content"></main>
 
-      let base = items.slice();
-      if (homeMode === "latest") base = base.slice().reverse();
-      if (homeMode === "random") base = getRandomItems(base, base.length);
+<script>
+const artData = [
+  {
+    img:"https://ih1.redbubble.net/image.6038082908.8059/flat,600x600,075,f.jpg",
+    link:"https://ih1.redbubble.net/image.6038082908.8059/flat,600x600,075,f.jpg",
+    desc:"Original art by Stelios Winters"
+  }
+];
 
-      const start = homePageIndex[key] * 3;
-      const slice = base.slice(start, start + 3);
+const categoryData = {
+  art: artData,
+  youtube: [],
+  music: [],
+  books: []
+};
 
-      container.innerHTML = "";
-      slice.forEach(item => {
-        container.innerHTML += `
-          <a href="${item.link}" target="_blank" class="thumb slide">
-            <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
-                 data-src="${item.img}" class="lazy">
-            <span class="desc">${item.desc || ""}</span>
-          </a>`;
-      });
+let homeMode = "latest";
 
-      // hide/show left arrow
-      const left = document.getElementById("arrow-left-" + key);
-      const right = document.getElementById("arrow-right-" + key);
-      const maxPage = Math.floor((items.length - 1) / 3);
+function toggleMenu() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
 
-      if (left) left.style.visibility = homePageIndex[key] === 0 ? "hidden" : "visible";
-      if (right) right.style.visibility = homePageIndex[key] >= maxPage ? "hidden" : "visible";
+function loadContent(cat, el) {
+  let html = "";
 
-      lazyLoadImages();
-    }
-
-    function homeNext(key) {
-      const maxPage = Math.floor((categoryData[key].length - 1) / 3);
-      homePageIndex[key] = Math.min((homePageIndex[key] || 0) + 1, maxPage);
-      renderHomeCategory(key);
-    }
-
-    function homePrev(key) {
-      homePageIndex[key] = Math.max((homePageIndex[key] || 0) - 1, 0);
-      renderHomeCategory(key);
-    }
-
-    
-    const homeOrder = ["youtube", "videogames", "music", "series", "toppicks", "books", "store", "services"];
-    
-    function getRandomItems(arr, n) {
-      let result = [];
-      let taken = [];
-      n = Math.min(n, arr.length);
-      while(result.length < n) {
-        let index = Math.floor(Math.random() * arr.length);
-        if (!taken[index]) {
-          result.push(arr[index]);
-          taken[index] = true;
-        }
-      }
-      return result;
-    }
-    
-    function lazyLoadImages() {
-      const lazyImages = document.querySelectorAll("img.lazy:not(.loaded)");
-      const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            img.src = img.dataset.src;
-            img.classList.add("loaded");
-            observer.unobserve(img);
-          }
-        });
-      });
-      lazyImages.forEach(img => imageObserver.observe(img));
-    }
-    
-    window.onscroll = function() {
-      document.getElementById("backToTop").style.display =
-        (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
-    };
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    
-    function getDisplayTitle(cat) {
-      if (cat === "toppicks") return "Top Picks";
-      if (cat === "videogames") return "Video Games";
-      if (cat === "store") return "Store";
-      if (cat === "series") return "Series";
-      return cat.charAt(0).toUpperCase() + cat.slice(1);
-    }
-    
-    function adjustSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      if (sidebar.scrollHeight <= window.innerHeight) {
-        sidebar.classList.add("open");
-      } else {
-        sidebar.classList.remove("open");
-      }
-    }
-    window.addEventListener("load", adjustSidebar);
-    window.addEventListener("resize", adjustSidebar);
-    
-    const extraToppicks = [];
-    const extraMusic = [];
-    const extraVideogames = [];
-    const extraBooks = [];
-    const extraServices = [];
-    
-    const artData = [];
-    for (let i = 1; i <= 3; i++) {
-      artData.push({
-        img: `https://www.color-hex.com/palettes/7449.png`,
-        link: `https://www.color-hex.com/palettes/7449.png`,
-        desc: `Art image ${i}`
-      });
-    }
-    
-    const youtubeVideoIds = [
-      "YFqLjY4heFY" , "ud8MGgGEyig" , "PUPQ0AIzwT8" , "hJkBVrGHB-M" , "hVRZv61hy-s" , "HRyvS2vJdSs" , "czKhxwO5g1E" , "lMsBoMVeJIg" , "uF2JZux71po" , "qD-s3tx_cls" , "7w2ochUNyes" , "k_0yWYEhT4o" , "dyiyiBeS6Kw" , "LbWphM9ULjY" , "jbNZQr_2Apk" , "TviCUaGfwG4" ,
-      "5vt6RE4J0oE", "X69QujXQFug", "x4Bv72eAEzI", "xbIhyb2kI1U", "XN4hiDQT77k", "qsZBJH2ev9w", "mt3DlxYbuN8", "orzLvvF8Bbs", "zfAoAdV0WUs",
-      "4_0SsReFHFA", "dsIhBWBlyVE", "uFuE-JF8Y64", "tUdWIvIdhT0", "U0lTN1JwgyY", "KCx0UVWEPQw",
-      "9Se2icjFzIE", "UIrjdLGZHpo", "JfxevioMFT4", "eXpIe4Z4npw", "feFS70kQG20", "6jPgXFeSlaM",
-      "78-EsIm0Q-E", "JDcz12_gYOA", "gk9ulqfKVFU", "3S2Fr4YU9iU", "aRI2IR98Hh8", "jKt1caBdf80",
-      "N_3p7FA5hFs", "Kri9Va_4530", "AR5FaRr2uaE", "O27_PCqN6eM", "pfDKiQTe08c", "AFB4u-Kc36o",
-      "4YjW5IBllj0", "2TgXqQ2S1SM", "M-gbfhu9G5M", "RJcRjwLvuq4", "ZILVBTXqVnQ", "nIC2ta_FSL4",
-      "JKZ5MUR76tU", "ilfr8YWhSfE", "GCjMNvcjfhs", "sDFHrjHwsfI", "WVXbtloIUFY", "GVa8sTsAvu0",
-      "LzCaZgtecgc", "vppoPeqzBHE", "G-HmwL3M7IA", "psh1Kg9c-DQ", "rKbO3Qy36vs", "zZ4taWprVtU",
-      "jU792GLMyEY", "MDDJHNeEb1w", "FPqD8OZ0nAo", "ndNkoNIvNJg", "_t1GCQNUePU", "6pFcv5uHTuA",
-      "nlsYvLtu7-Y", "wDiGyCbJ-Bc", "0_JQpIaUzAg", "3BQWA77V_9k", "erThqRD5Tpc", "SA7xD9fky40",
-      "6eEdefc02Rk", "1BjVcQxlK0g", "D2kdy2s5-Pg", "iIBKXopJpzc", "H-QxA3lpOF4", "GZUh16o8rKs",
-      "lw_gViePSbk", "XDqg_yDSo20", "1PLs7XKuvCw", "ynR2MTJnTE8", "mvR4CGTjMyU", "tuZCoMxKJd0",
-      "G7gnUNs7O24", "8AISOuT781o", "6qYXNAjdLrQ", "a4SWL2wyyJ4", "vSPDJc7BGBA", "GrNnL6He_qM",
-      "nW8nlQEQ7cg", "vHRfokvuSig", "JkYGzvVP5Do", "Rizxr8A5vMs", "is3xUsWIcEw", "xvzuajTm564",
-      "ptqG8USGQ5E", "XYmmwZGLpxQ", "R4eQvofJJqs", "C9XkzsUgPno", "hc21g7xQv2Y", "uB5FAlS1V4k",
-      "_Ai98wkSKs0", "46NAQnHvBt0", "rSDGbxEcseI", "sWUzP7FB-o8", "uARs4v-mqnE", "OV3mkduZzXI",
-      "SW5u0ePoeO8", "0N6Sz2JXtls", "fFfEExQS1mk", "ySLATyDKJwg", "Bkjqr4tzM1o", "VcKRpHHJV6c",
-      "v10OEnFUpEw", "cfoIEWjqbbE", "-OkjBB1WJTY", "4ar8kYTxstA", "M2wfIG_-3gQ", "DcnuZFt2Hfg",
-      "5q0vD8A4ZwI", "4w3UeEwq6DM", "Xbc2ms6TE9Q", "ncCmQXAbSRk", "PkYjOLgAuE8", "-YzhOZVZy1Q",
-      "QI6j6yc0_To", "p8jUZuMaUsQ", "rmTbYRwQ27s", "aOjxWXTCWFM", "pW3F35-aaP4", "zq-G4fdude4",
-      "e_BahN028Tg", "sgSEaJ3nKm0", "Ui67tnD5byE", "WRpRmv3ZAw8", "0HBzxScw3qY", "40YO8tQg5P8",
-      "_P1Yj7ik1_M", "dgF-bXT5GVk", "fyVkUFAziNw", "RRnsOAPWREc", "TKjkw5UL2ik", "m4Ftodlv5gs",
-      "fjNJ8j04dWA", "tHGDZD5ylyI", "wdo6LvPUg2c", "8K5VyGQ6QmM", "cd3fjQTocB4", "XM7rNS0mUQI",
-      "n_zFJ_D-U-c", "iGz8Y8QyMJY", "NhRjWJEKiw0", "OXQh-jzT8T8", "6q8bUW4veHE", "7Z5Fj1KtHsI",
-      "MOJfMPanjZc", "ZfEZQVLGJWk", "jTCygSOOp6A", "72qmtr41iWU", "Q27FodNGKGw", "wFawF4eDGJo",
-      "iyK_9bQH5vw", "p1TPs00c1W8", "WzxRMBlwG_k", "Y4PMBqHRHFY", "Xx49tSC_KHc", "g_0_yaX6BQo",
-      "A75aWr1M2e0", "xb8_RpDUBr0", "28p4_TX7XrY", "cMqKztorZMU"
-    ];
-    
-    let placeholderYouTube = youtubeVideoIds.slice().reverse().map(id => ({
-      img: `https://img.youtube.com/vi/${id}/0.jpg`,
-      link: `https://www.youtube.com/watch?v=${id}`,
-      desc: "Loading title..."
-    }));
-    
-    const categoryData = {
-      toppicks: [
-        { img: "https://img.youtube.com/vi/pW3F35-aaP4/mqdefault.jpg", link: "https://www.youtube.com/watch?v=pW3F35-aaP4", desc: "Human Food - Claymation AI Movie" },
-        { img: "https://img.youtube.com/vi/is3xUsWIcEw/mqdefault.jpg", link: "https://www.youtube.com/watch?v=is3xUsWIcEw", desc: "The Most Ridiculous Inventions of All Time" },
-        { img: "https://img.itch.zone/aW1nLzI5NDk0MzkucG5n/315x250%23c/4gldnA.png", link: "https://stelioswinters.itch.io/magneblock", desc: "IQ based, brain puzzle solving video game​." },
-        { img: "https://img.youtube.com/vi/DcnuZFt2Hfg/mqdefault.jpg", link: "https://www.youtube.com/watch?v=DcnuZFt2Hfg", desc: "I Asked AI to Generate a Video of a Wizard" },
-        { img: "https://img.itch.zone/aW1nLzIyMjc2ODAucG5n/315x250%23c/CAqP7V.png", link: "https://stelioswinters.itch.io/cyclomadron-carnage", desc: "The sequel is here with more challenges and this time you must kill everyone!" },
-        { img: "https://img.youtube.com/vi/SA7xD9fky40/mqdefault.jpg", link: "https://www.youtube.com/watch?v=SA7xD9fky40", desc: "I Found the Oldest Toy Gun and War Commercials" },
-        { img: "https://img.itch.zone/aW1nLzI5NjAzODAucG5n/315x250%23c/9TJ%2BkT.png", link: "https://stelioswinters.itch.io/cyborg-love", desc: "Mirror movement, puzzle platformer. Because cyborgs deserve love too!" },
-        { img: "https://img.youtube.com/vi/1BjVcQxlK0g/mqdefault.jpg", link: "https://www.youtube.com/watch?v=1BjVcQxlK0g", desc: "Will Smith's Meaty Flavored Gelatinous Meat Jello" },
-        { img: "https://img.itch.zone/aW1nLzI1MDI3ODkucG5n/315x250%23c/qNYr3M.png", link: "https://stelioswinters.itch.io/poolf", desc: "Pool minigolf!" },
-        { img: "https://img.youtube.com/vi/C9XkzsUgPno/mqdefault.jpg", link: "https://www.youtube.com/watch?v=C9XkzsUgPno", desc: "These 13 Amazing Inventions Will Blow Your Mind" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNTMyLmpwZw==/315x250%23c/u1J9dg.jpg", link: "https://stelioswinters.itch.io/energy-force-omega", desc: "Barely bouncing anymore, so sad.. It's ok though, gravity is cool!" },
-        { img: "https://img.youtube.com/vi/G-HmwL3M7IA/mqdefault.jpg", link: "https://www.youtube.com/watch?v=G-HmwL3M7IA", desc: "Evolution of MOBA Games 1989-2024" },
-        { img: "https://img.itch.zone/aW1nLzIxNzkyNjQucG5n/315x250%23c/F7%2Br0e.png", link: "https://stelioswinters.itch.io/stelios-winters", desc: "Stelios Winters - Self Titled" },
-        { img: "https://img.itch.zone/aW1nLzIyMjc2NzgucG5n/315x250%23c/yBf5ev.png", link: "https://stelioswinters.itch.io/cyclomadron", desc: "Amazing platformer with many different styles of gameplay" },
-        { img: "https://img.youtube.com/vi/-OkjBB1WJTY/mqdefault.jpg", link: "https://www.youtube.com/watch?v=-OkjBB1WJTY", desc: "I Asked AI to Generate a Hotdog Commercial. Help" }
-      ].concat(extraToppicks),
-      series: [
-        { img: "https://i.ytimg.com/vi/72qmtr41iWU/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGliIbZw1gXGhW2bmqHhywQP", desc: "AI Transformation" },
-        { img: "https://i.ytimg.com/vi/n_zFJ_D-U-c/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGmgDzBnj7OAbsXplUqLnFNs", desc: "Over The Decades" },
-        { img: "https://i.ytimg.com/vi/cMqKztorZMU/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGnHlPxMGbeZ-IWHO-i9NioQ", desc: "AI Generated Comedy" },
-        { img: "https://i.ytimg.com/vi/iyK_9bQH5vw/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGn5uuHCUP6fyHs375JrNjvU", desc: "Gaming Challenge" },
-        { img: "https://i.ytimg.com/vi/4ar8kYTxstA/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGllSzpoDVLr1rtrpPTvxVEI", desc: "Trippy AI Video Art" },
-        { img: "https://i.ytimg.com/vi/Y4PMBqHRHFY/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGnCl-IvKsJfp3tZoVPorn9_", desc: "ChatGPT" },
-        { img: "https://i.ytimg.com/vi/Rizxr8A5vMs/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGm61hav-qEAYW5V_edtvTv6", desc: "Ai Movies" },
-        { img: "https://i.ytimg.com/vi/hc21g7xQv2Y/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGkuk4_ajK0XXtZFh6aIy6D0", desc: "Liminal Space" },
-        { img: "https://i.ytimg.com/vi/5vt6RE4J0oE/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGkiix6d9ACSGixGydYaJ1lR", desc: "First Time Ever" },
-        { img: "https://i.ytimg.com/vi/0_JQpIaUzAg/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGm-Lwk8JBdvCwfLm21ehwf0", desc: "AI Voice" },
-        { img: "https://i.ytimg.com/vi/XYmmwZGLpxQ/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGngaymuJ6VaIlEJr5Xowkrh", desc: "Inventions" },
-        { img: "https://i.ytimg.com/vi/FPqD8OZ0nAo/hqdefault.jpg", link: "https://www.youtube.com/playlist?list=PLrwQcOAMnvGnfn29DGPl_S-VzaPwbMyYH", desc: "Evolution" }
-      ],
-      youtube: placeholderYouTube,
-      videogames: [
-        { img: "https://img.itch.zone/aW1nLzIyMjc2NzgucG5n/315x250%23c/yBf5ev.png", link: "https://stelioswinters.itch.io/cyclomadron", desc: "Amazing platformer with many different styles of gameplay" },
-        { img: "https://img.itch.zone/aW1nLzIyMjc2ODAucG5n/315x250%23c/CAqP7V.png", link: "https://stelioswinters.itch.io/cyclomadron-carnage", desc: "The sequel is here with more challenges and this time you must kill everyone!" },
-        { img: "https://img.itch.zone/aW1nLzE5MTMxNzU1LmpwZw==/315x250%23c/BA6YUy.jpg", link: "https://stelioswinters.itch.io/wolverun", desc: "Tigerians want to control the universe and mark it as their empire. Will Wolveruns stop their sinister plans?" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNDU5LmpwZw==/315x250%23c/aKCwyy.jpg", link: "https://stelioswinters.itch.io/energy-force", desc: "Bounce, bounce, bounce, bounce, bounce.." },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNTMyLmpwZw==/315x250%23c/u1J9dg.jpg", link: "https://stelioswinters.itch.io/energy-force-omega", desc: "Barely bouncing anymore, so sad.. It's ok though, gravity is cool!" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNzY2LmpwZw==/315x250%23c/1b%2FEIi.jpg", link: "https://stelioswinters.itch.io/energy-force-g", desc: "Omega is traveling the multiverse destroying everything on its path." },
-        { img: "https://img.itch.zone/aW1nLzIzMjg2NDIucG5n/315x250%23c/qoJy7q.png", link: "https://stelioswinters.itch.io/pneumachinic", desc: "Psychological horror/multiple-choice adventure game." },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNTA1LmpwZw==/315x250%23c/%2BJPsuD.jpg", link: "https://stelioswinters.itch.io/rampire", desc: "Build mazes and traps to slow down your enemies and kill them before they escape!" },
-        { img: "https://img.itch.zone/aW1nLzMwMjc3NjIucG5n/315x250%23c/FHlpRF.png", link: "https://stelioswinters.itch.io/catagolf", desc: "Golf with a catapult!" },
-        { img: "https://img.itch.zone/aW1nLzI1MDI3ODkucG5n/315x250%23c/qNYr3M.png", link: "https://stelioswinters.itch.io/poolf", desc: "Pool minigolf!" },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNTY4LmpwZw==/315x250%23c/DsRyq0.jpg", link: "https://stelioswinters.itch.io/hit-n-descent", desc: "Hit the ball with your mouse racket to pass the level!" },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNjIxLmpwZw==/315x250%23c/mu%2FgR0.jpg", link: "https://stelioswinters.itch.io/run-n-fight", desc: "Find your way through the mazes avoiding enemies until you find your weapon and take revenge." },
-        { img: "https://img.itch.zone/aW1nLzI5NjAzODAucG5n/315x250%23c/9TJ%2BkT.png", link: "https://stelioswinters.itch.io/cyborg-love", desc: "Mirror movement, puzzle platformer. Because cyborgs deserve love too!" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwMzMxLmpwZw==/315x250%23c/osmaU1.jpg", link: "https://stelioswinters.itch.io/cyborg-chrismas", desc: "Cyclomadron needs to collect all the ornaments for his metal Christmas tree while avoiding the coal!" },
-        { img: "https://img.itch.zone/aW1nLzIwNTcxMzY4LmpwZw==/315x250%23c/XPCZd9.jpg", link: "https://stelioswinters.itch.io/master-parker", desc: "Avoid cars and cones while trying to get your parking pass to unlock the parking and park your car" },
-        { img: "https://img.itch.zone/aW1nLzcyMzU3NzcucG5n/315x250%23c/H0LR0D.png", link: "https://stelioswinters.itch.io/stick-over-it", desc: "Stick Over It is a punishing climbing game with the purpose on reaching the top of the neon castle." },
-        { img: "https://img.itch.zone/aW1nLzcyNTAxNjkucG5n/315x250%23c/PIuOo3.png", link: "https://stelioswinters.itch.io/bounce-over-it", desc: "Bounce Over It is a punishing climbing platformer game with the purpose on reaching the top of the neon castle." },
-        { img: "https://img.itch.zone/aW1nLzI5NDk0MzkucG5n/315x250%23c/4gldnA.png", link: "https://stelioswinters.itch.io/magneblock", desc: "IQ based, brain puzzle solving video game​." },
-        { img: "https://img.itch.zone/aW1nLzIyNDk1MzAucG5n/315x250%23c/0hnaGI.png", link: "https://stelioswinters.itch.io/tetrablock", desc: "Falling block matching puzzle video game.​" },
-        { img: "https://img.itch.zone/aW1nLzI0Mzc1OTYucG5n/315x250%23c/MVa0bd.png", link: "https://stelioswinters.itch.io/colorblock", desc: "Tile matching puzzle video game." },
-        { img: "https://img.itch.zone/aW1nLzIzNjYxNTEucG5n/315x250%23c/jBr5Ap.png", link: "https://stelioswinters.itch.io/metrablock", desc: "Block matching puzzle video game.​" },
-        { img: "https://img.itch.zone/aW1nLzIxMzE0MTMucG5n/315x250%23c/r%2FU783.png", link: "https://stelioswinters.itch.io/shadowcut", desc: "Kill enemies and unlock new characters with different attacks!" },
-        { img: "https://img.itch.zone/aW1nLzI0MDYzMDQucG5n/315x250%23c/t%2Ftdqd.png", link: "https://stelioswinters.itch.io/minimalisports", desc: "Multiplayer minimalistic fun!" },
-        { img: "https://img.itch.zone/aW1nLzIwNzA5NjY5LmpwZw==/315x250%23c/jkCyUP.jpg", link: "https://stelioswinters.itch.io/fwoggy", desc: "Rage trying to push the yarn to the princess for a present" },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNjkzLmpwZw==/315x250%23c/56s0U6.jpg", link: "https://stelioswinters.itch.io/drift-of-death", desc: "A lone racer enters a brutal competition where every track is a battlefield." },
-        { img: "https://img.itch.zone/aW1nLzIwOTc5ODg1LmpwZw==/315x250%23c/p5BUTf.jpg", link: "https://stelioswinters.itch.io/blockablock", desc: "Falling block matching endurance puzzle video game.​" },
-        { img: "https://img.itch.zone/aW1nLzIxMDQ0Mzg0LmpwZw==/315x250%23c/fmPAUl.jpg", link: "https://stelioswinters.itch.io/wireblock", desc: "Falling block circuit-building puzzle video game.​" },
-        { img: "https://img.itch.zone/aW1nLzIxMjcwMDQ4LmpwZw==/315x250%23c/cS27Oa.jpg", link: "https://stelioswinters.itch.io/cublock", desc: "Falling block square matching puzzle video game.​" }
-      ],
-        music: [
-        { img: "https://img.itch.zone/aW1nLzIxMzEyNzkucG5n/315x250%23c/0Qukye.png", link: "https://stelioswinters.itch.io/wolverun-trilogy-ep", desc: "Wolverun Trilogy EP" },
-        { img: "https://img.itch.zone/aW1nLzIxNzkyNjQucG5n/315x250%23c/F7%2Br0e.png", link: "https://stelioswinters.itch.io/stelios-winters", desc: "Stelios Winters - Self Titled" },
-        { img: "https://img.itch.zone/aW1nLzIxODQyNzQucG5n/315x250%23c/XX6RWf.png", link: "https://stelioswinters.itch.io/stelios-winters-glass-of-skies", desc: "Stelios Winters - Glass of Skies" },
-        { img: "https://img.itch.zone/aW1nLzIxOTQ3NjYucG5n/315x250%23c/yf9dru.png", link: "https://stelioswinters.itch.io/stelios-winters-lucid-insanity", desc: "Stelios Winters - Lucid Insanity" },
-        { img: "https://img.itch.zone/aW1nLzIzMDA2NzUucG5n/315x250%23c/djGTK2.png", link: "https://stelioswinters.itch.io/stelios-winters-nightmare-of-fears", desc: "Stelios Winters - Nightmare of Fears" }
-      ],
-      books: [
-        { img: "https://img.itch.zone/aW1nLzIxMjkxNjAucG5n/315x250%23cb/8UKuHl.png", link: "https://stelioswinters.itch.io/amalgamated-vol-1", desc: "Azen & Hikari are discovering their supernatural abilities while something sinister is happening in the shadows." },
-        { img: "https://img.itch.zone/aW1nLzIxMjkzMDMucG5n/315x250%23cb/bmFSSw.png", link: "https://stelioswinters.itch.io/amalgamated-vol-2", desc: "People are in danger while Azen & Hikari are sharpening their new abilities by competing in a tournament." },
-        { img: "https://img.itch.zone/aW1nLzUyMDg0NTUucG5n/315x250%23cb/5t9Mqp.png", link: "https://stelioswinters.itch.io/incandescent-shadow", desc: "A soul is navigating the murky corridors of depression." },
-        { img: "https://m.media-amazon.com/images/I/51ZsHBZKiRL._SY522_.jpg", link: "https://www.amazon.com/Ultimate-Content-Creation-Stelios-Winters-ebook/dp/B0FH32L1VC", desc: "This all‑in‑one guide has everything you need to plan, make, brand, and even earn from your videos, streams, podcasts, and social posts." },
-        { img: "https://m.media-amazon.com/images/I/71GH2xEEpbL._SY522_.jpg", link: "https://www.amazon.com/Cooking-Exposed-Transforming-Toxic-Vital-ebook/dp/B0FMYGT1FZ", desc: "This book won't you what not to eat, it shows you smart swaps—replacing toxic options with vital ones that nourish your body while still tasting great." }
-      ],
-      store: [
-        { img: "https://ih0.redbubble.net/avatar.1020485.140x140.jpg", link: "https://www.redbubble.com/people/STELIOSGAME/shop", desc: "Merch Store" },
-        { img: "https://public-files.gumroad.com/h8sifxbh6ydhraeos91cn34avwtd", link: "https://stelioswinters.gumroad.com/", desc: "Digital Store" }
-      ],
-      services: [
-        { img: "https://img.itch.zone/aW1nLzI0Mzc3NjkucG5n/315x250%23c/W1PEqi.png", link: "https://stelioswinters.itch.io/graphic-designing", desc: "Graphic designing services!" }
-      ],
-      art: artData,
-    };
-    
-    function loadContent(cat, el) {
-      let html = "";
-      if (cat === "home") {
-        html += `<h4 class="category-title">
-                   <span class="home-title-tabs">
-                     <span class="tab ${homeMode === "latest" ? "active" : ""}" onclick="setHomeMode('latest')" id="tab-latest">Latest</span>
-                     <span class="tab ${homeMode === "oldest" ? "active" : ""}" onclick="setHomeMode('oldest')" id="tab-oldest">Oldest</span>
-                     <span class="tab ${homeMode === "random" ? "active" : ""}" onclick="setHomeMode('random')" id="tab-random">Random</span>
-                   </span>
-                 </h4>`;
-        homeOrder.forEach(key => {
-          if (categoryData[key] && Array.isArray(categoryData[key])) {
-            let items = categoryData[key];
-            let selection = [];
-            if (homeMode === "latest") {
-              selection = items.slice(-3).reverse();
-            } else if (homeMode === "oldest") {
-              selection = items.slice(0, 3);
-            } else if (homeMode === "random") {
-              selection = getRandomItems(items, 3);
-            }
-            if (selection.length) {
-              html += `<div class="category-section">
-                         <h5 class="category-name"><span id="arrow-left-${key}" onclick="homePrev('${key}')" style="cursor:pointer;margin-right:6px;">◀</span>
-                           <span>${getDisplayTitle(key)}</span><span id="arrow-right-${key}" onclick="homeNext('${key}')" style="cursor:pointer;margin-left:6px;">▶</span>
-                           <button class="view-all-button" onclick="return loadContent('${key}', this)">View all →</button>
-                         </h5>
-                         <div class="grid home-grid" id="home-grid-${key}">`;
-              selection.forEach(item => {
-                html += `<a href="${item.link}" target="_blank" class="thumb">
-                           <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${getDisplayTitle(key)} thumbnail" class="lazy">
-                           <span class="desc">${item.desc || ("Latest from " + getDisplayTitle(key))}</span>
-                         </a>`;
-              });
-              html += `</div></div>`;
-              setTimeout(() => renderHomeCategory(key), 0);
-            }
-          }
-        });
-      } else if (cat === "contact") {
-        html = `<h4 class="category-title">Contact</h4>
-          <div class="contact-form">
-            <form action="mailto:ninewinters@hotmail.com" method="POST" enctype="text/plain">
-              <label for="email">Email:</label>
-              <input type="email" id="email" name="email" required>
-              <label for="subject">Subject:</label>
-              <input type="text" id="subject" name="subject" required>
-              <label for="message">Message:</label>
-              <textarea id="message" name="message" rows="4" required></textarea>
-              <button type="submit">Send</button>
-            </form>
-          </div>`;
-      } else if (cat === "about") {
-        html = `<h4 class="category-title">About</h4>
-        <p><section class="about-stelios-winters">
-
-<section class="about-stelios-winters">
-
-  <h3>Who is Stelios Winters?</h3>
-  <p>
-    I’m an online content creator and artist who makes things I would personally love to watch, play, listen to, or read, using creativity as a way to express emotions and hopefully make the world and people’s lives a little better.
-  </p>
-
-  <h3>What do you do online?</h3>
-  <p>
-    I create online products and content that I am genuinely passionate about, including videos, indie games, music, and books.
-  </p>
-
-  <h3>What is STELELE?</h3>
-  <p>
-    STELELE is my YouTube channel where I focus on making "funny", interesting, and sometimes weird experimental content that reflects my curiosity and personality.
-  </p>
-
-  <h3>What kind of videos do you make?</h3>
-  <p>
-    I make a mix of idea-based videos, trying things for the first time like foods or experiences, technology content, nostalgia and retro topics, and creativity in a relaxed way.
-  </p>
-
-  <h3>How do all your projects connect?</h3>
-  <p>
-    Everything I make is connected, so an idea might start as a YouTube video and later turn into a game, a song, or a book.
-  </p>
-
-  <h3>Is there a main theme behind your work?</h3>
-  <p>
-    The main theme is thinking like a mad scientist and exploring ideas in an out-of-the-box way, even when they don’t fit neatly into categories. Just having fun and enjoying doing it.
-  </p>
-
-  <h3>Why do you work in so many creative fields?</h3>
-  <p>
-    I love consuming content in these fields, and when I feel something is missing or can be done in a better way, I get excited and want to create the thing I wish already existed.
-  </p>
-
-  <h3>What role do games play in your creative work?</h3>
-  <p>
-    Games are everywhere, from video games to sports to everyday systems, and I love them because almost everyone connects with games in some way.
-  </p>
-
-  <h3>What kind of games do you make?</h3>
-  <p>
-    I make indie games that focus on simple, enjoyable mechanics and fun experiences rather than focusing too much on visuals.
-  </p>
-
-  <h3>How does music fit into your online presence?</h3>
-  <p>
-    I grew up listening to music a lot, especially when I was feeling sad, and it helped me through depression and anxiety, so making music is my way of helping others feel better the way music helped me.
-  </p>
-
-  <h3>Why did you start writing books?</h3>
-  <p>
-    Over the years I gathered a lot of knowledge across creativity, content creation, and personal growth, and writing books felt like the best way to share it.
-  </p>
-
-  <h3>Who is your content for?</h3>
-  <p>
-    I create content that I personally enjoy consuming, and I hope it attracts like-minded people so we can build a community that creates a positive impact in the world.
-  </p>
-
-  <h3>What do you want people to feel after watching your videos or playing your games?</h3>
-  <p>
-    If someone is struggling, I hope my content distracts them and helps them feel better, and if they’re not, I just want them to have a good time and enjoy it.
-  </p>
-
-  <h3>What makes your approach different from other creators?</h3>
-  <p>
-    Nothing and everything is unique. I just focus on being honest and authentic in my own insane way, making things I would love to consume myself, and only following trends when they genuinely inspire me, not to chase fame.
-  </p>
-
-  <h3>How do you think about growth and success online?</h3>
-  <p>
-    Emotionally, I already feel successful and proud of my projects, but I haven’t reached the kind of success the world defines as financial yet, which I want so I can be free from society’s constraints and focus on higher-quality work that truly represents what I’m capable of, because right now I know something is still missing.
-  </p>
-
-  <h3>What do you want the name Stelios Winters to represent?</h3>
-  <p>
-    Creativity, no regrets, and never giving up on your goals when you truly believe they can positively impact your future. Listening to other people’s opinions to clear your mind, and inspiring others to keep going.
-  </p>
-
-  <h3>What is your long-term vision as an online creator?</h3>
-  <p>
-    I want to keep creating things I’m passionate about forever, and even if I succeed financially, I don’t care about legacy, I just want to be happy and help make the world a better place.
-  </p>
-
-  <h3>Where should someone new start?</h3>
-  <p>
-    This website is the best place to find everything I do in one spot, but especially the STELELE YouTube channel, where I’m making more personal on-camera content so people can get to know me better.
-  </p>
-
-</section>
-</p>`;
-      } else if (cat === "art") {
-        html += `<h4 class="category-title">Art</h4><div class="grid">`;
-        categoryData[cat].slice().reverse().forEach(item => {
-          html += `<div class="photo" onclick="openModal('${item.img}')">
-                     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="Art" class="lazy">
-                     <span class="desc">${item.desc || 'Art image'}</span>
-                   </div>`;
-        });
-        html += `</div>`;
-      } else if (cat === "search") {
-        html += `<h4 class="category-title">Search Results</h4>`;
-        if (el.results && el.results.length) {
-          html += `<div class="grid">`;
-          el.results.forEach(item => {
-            html += `<a href="${item.link}" target="_blank" class="thumb">
-                       <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${item.title} thumbnail" class="lazy">
-                       <span class="desc">${item.desc || 'No description available.'}</span>
-                     </a>`;
-          });
-          html += `</div>`;
-        } else {
-          html += `<p>No results found for "${el.query}"</p>`;
-        }
-      } else {
-        let title = getDisplayTitle(cat);
-        html += `<h4 class="category-title">${title}</h4><div class="grid">`;
-        categoryData[cat].slice().reverse().forEach(item => {
-          html += `<a href="${item.link}" target="_blank" class="thumb">
-                     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${title} thumbnail" class="lazy">
-                     <span class="desc">${item.desc || 'No description available'}</span>
-                   </a>`;
+  if (cat === "home") {
+    html += `
+      <section>
+        <h1 class="category-title">Stelios Winters</h1>
+        <p style="max-width:700px;color:var(--muted);margin-bottom:30px">
+          Original art, films, and creative experiments.
+        </p>
+      </section>
+    `;
+    for (let key in categoryData) {
+      if (categoryData[key].length) {
+        html += `<h2 class="category-title">${key.toUpperCase()}</h2><div class="grid">`;
+        categoryData[key].forEach((it,i)=>{
+          html += `
+            <a href="${it.link}" target="_blank" style="--i:${i}">
+              <img src="${it.img}" alt="${it.desc}">
+            </a>`;
         });
         html += `</div>`;
       }
-      document.getElementById("main-content").innerHTML = html;
-      document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-      if (el && el.tagName) {
-        if (el.closest(".sidebar")) {
-          el.classList.add("active");
-        } else {
-          document.querySelectorAll(".sidebar a").forEach(link => {
-            if (link.textContent.trim().toLowerCase() === getDisplayTitle(cat).toLowerCase()) {
-              link.classList.add("active");
-            }
-          });
-        }
-      }
-      lazyLoadImages();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return false;
     }
-    
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("open");
-    }
-    
-    function openModal(src) {
-      const modal = document.getElementById("photoModal");
-      modal.style.display = "flex";
-      const modalImg = modal.querySelector("img");
-      modalImg.dataset.src = src;
-      lazyLoadImages();
-    }
-    function closeModal() {
-      document.getElementById("photoModal").style.display = "none";
-    }
-    
-    function doSearch() {
-      let query = document.getElementById("searchInput").value.trim();
-      if (!query) {
-        alert("Please enter a search term.");
-        return;
-      }
-      query = query.toLowerCase();
-      let results = [];
-      for (let key in categoryData) {
-        if (Array.isArray(categoryData[key]) && key !== "art" && key !== "contact") {
-          let title = getDisplayTitle(key);
-          categoryData[key].forEach(item => {
-            if ((item.desc && item.desc.toLowerCase().includes(query)) || title.toLowerCase().includes(query)) {
-              results.push({ img: item.img, link: item.link, title: title, desc: item.desc });
-            }
-          });
-        }
-      }
-      loadContent("search", { results: results, query: query });
-    }
-    document.getElementById("searchInput").addEventListener("keyup", function(event) {
-      if (event.key === "Enter") { doSearch(); }
+  }
+
+  else if (cat === "art") {
+    html += `<h1 class="category-title">Art</h1><div class="grid">`;
+    artData.forEach((it,i)=>{
+      html += `
+        <a href="${it.link}" target="_blank" style="--i:${i}">
+          <img src="${it.img}" alt="${it.desc}">
+        </a>`;
     });
-    
-    function setHomeMode(mode) {
-      homeMode = mode;
-      loadContent("home", document.getElementById("home-link"));
-    }
-    
-    loadContent("home", document.getElementById("home-link"));
-    
-    function populateYouTubeVideos() {
-      const reversedIds = youtubeVideoIds.slice().reverse();
-      const promises = reversedIds.map(id =>
-        fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
-          .then(response => {
-            if (!response.ok) { throw new Error("Network error"); }
-            return response.json();
-          })
-          .then(data => ({
-            img: `https://img.youtube.com/vi/${id}/0.jpg`,
-            link: `https://www.youtube.com/watch?v=${id}`,
-            desc: data.title
-          }))
-          .catch(() => ({
-            img: `https://img.youtube.com/vi/${id}/0.jpg`,
-            link: `https://www.youtube.com/watch?v=${id}`,
-            desc: "Title not available"
-          }))
-      );
-      Promise.all(promises).then(results => {
-        categoryData.youtube = results;
-        const activeLink = document.querySelector(".sidebar a.active");
-        if (activeLink && activeLink.textContent.trim().toLowerCase() === "youtube") {
-          loadContent("youtube", activeLink);
-        } else {
-          loadContent("home", document.getElementById("home-link"));
-        }
-      });
-    }
-    
-    populateYouTubeVideos();
-  </script>
- <div style="display:none;">
-Who is Stelios Winters?  
-Stelios Winters is an online content creator, multimedia artist, YouTuber, indie game developer, musician, writer, storyteller, digital media designer, lifestyle influencer, creative entrepreneur, tutorial creator, educator, art enthusiast, manga fan, graphic designer, digital artist, retro culture curator, nostalgia content creator, creative innovator, multimedia producer, educational content creator, interactive media designer, entertainment strategist, personal growth advocate, STELELE YouTube content creator, video content producer, indie game designer, and SEO-focused content strategist. He produces high-quality, engaging, fun, inspirational, educational, artistic, and interactive content across platforms including YouTube, STELELE channel, indie games, music, books, manga, art tutorials, graphic design content, retro media, nostalgia experiences, lifestyle, educational content, creative experiments, storytelling, and multimedia projects.
+    html += `</div>`;
+  }
 
-What do you do online?  
-Stelios creates videos, indie games, music, books, art tutorials, manga-inspired content, graphic design guides, interactive digital media, lifestyle content, educational entertainment, nostalgia and retro media, technology content, gaming content, creative experiments, challenge videos, reaction videos, reviews, tutorials, storytelling projects, interactive content, emotional engagement content, online community-building content, educational guides, multimedia projects, creativity-focused experiences, high-quality entertainment, and SEO-optimized content for discoverability and engagement on YouTube, STELELE, gaming platforms, music platforms, digital media, art, manga, graphic design, lifestyle platforms, and online communities.
+  else if (cat === "contact") {
+    html += `
+      <h1 class="category-title">Contact</h1>
+      <form class="contact-form" action="mailto:ninewinters@hotmail.com" method="POST" enctype="text/plain">
+        <input type="email" name="email" placeholder="Your email" required>
+        <textarea name="message" placeholder="Your message" rows="5" required></textarea>
+        <button type="submit">Send</button>
+      </form>`;
+  }
 
-What is STELELE?  
-STELELE is Stelios Winters’ YouTube channel that features funny, interesting, curiosity-driven, experimental, educational, lifestyle, technology, retro, nostalgia, idea-based, first-time experiences, creative storytelling, challenge videos, tutorials, review content, interactive experiences, emotional engagement, entertainment, art tutorials, manga reviews, graphic design demonstrations, creative projects, online engagement, SEO optimization, discoverability, audience retention, subscriber growth, community building, content strategy, and cross-platform multimedia content.
+  else {
+    html += `<h1 class="category-title">${cat}</h1><p style="color:var(--muted)">Coming soon.</p>`;
+  }
 
-What kind of videos do you make?  
-He makes idea-driven, experimental, curiosity-based, interactive, nostalgic, retro-inspired, technology-focused, lifestyle, fun, humorous, creative, educational, entertaining, storytelling-based, challenge-oriented, first-time experience, review-based, tutorial-based, art-focused, manga-focused, graphic design tutorials, creative project walkthroughs, indie game demos, music videos, multimedia storytelling, emotional engagement content, SEO-optimized YouTube content, audience retention-focused videos, and online discoverable content.
+  document.getElementById("main-content").innerHTML = html;
+  document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
+  if (el) el.classList.add("active");
+  return false;
+}
 
-How do all your projects connect?  
-All projects—videos, indie games, music, books, tutorials, art, manga, graphic design, interactive media, creative projects, educational content, and STELELE content—are interconnected, creating a cohesive multimedia ecosystem. Concepts evolve across platforms, linking YouTube videos, indie game mechanics, music production, books, art projects, manga storytelling, graphic design tutorials, interactive media, creative experiments, educational content, retro-inspired experiences, lifestyle content, audience engagement, SEO optimization, cross-platform growth, discoverability, and community impact.
+loadContent("home", document.getElementById("link-home"));
+</script>
 
-Is there a main theme behind your work?  
-The main theme is creativity, experimentation, curiosity, artistic expression, innovation, multimedia storytelling, interactive engagement, emotional impact, fun, humor, lifestyle content, nostalgia, retro culture, gaming, indie games, music, books, art, manga, graphic design, tutorials, educational content, personal growth, online engagement, digital media, discoverability, SEO-optimized content, interactive entertainment, creative learning, inspiration, and high-quality cross-platform digital experiences.
-
-Why do you work in so many creative fields?  
-Stelios works across multiple creative fields because he consumes, studies, and understands media across YouTube, STELELE, indie games, music, books, tutorials, art, manga, graphic design, lifestyle content, retro and nostalgia content, storytelling, educational entertainment, and interactive media. He identifies gaps, produces original content, delivers high-quality, fun, educational, and emotionally engaging experiences, and maximizes audience engagement, discoverability, SEO performance, cross-platform reach, and online community-building.
-
-What role do games play in your creative work?  
-Games are central to his work, including video games, indie games, tabletop games, gamified experiences, interactive storytelling, creative game mechanics, casual gameplay, experimental mechanics, retro gaming, nostalgia content, lifestyle integration, indie game development, interactive media, digital media, storytelling, audience engagement, educational game content, tutorials, multimedia experiences, emotional engagement, and online community-building.
-
-What kind of games do you make?  
-He creates indie games with simple but fun mechanics, engaging interactive experiences, casual gameplay, immersive storytelling, experimental mechanics, educational gameplay, creative learning games, retro-inspired designs, browser-friendly games, mobile games, multiplayer experiences, narrative-driven indie games, game design tutorials, multimedia storytelling, emotional engagement, and community-focused game content.
-
-How does music fit into your online presence?  
-Music is a central creative outlet, including indie music production, composition, audio storytelling, emotional engagement, mood-enhancing tracks, music tutorials, educational music guides, music video production, digital music distribution, original songs, interactive music projects, multimedia integration, creative expression, fan engagement, community-building, content discoverability, and cross-platform exposure.
-
-Why did you start writing books?  
-Writing books allows Stelios to share knowledge, creativity strategies, personal growth insights, digital media expertise, content creation methods, storytelling techniques, educational content, indie publishing guidance, lifestyle tips, artistic inspiration, tutorials, creative projects, emotional engagement, and community-building resources while maintaining SEO-optimized, discoverable content across multiple platforms.
-
-Who is your content for?  
-His audience includes gamers, YouTube viewers, STELELE subscribers, music fans, readers, art enthusiasts, manga fans, graphic designers, creatives, digital media consumers, lifestyle enthusiasts, educators, students, content creators, community participants, nostalgia lovers, retro culture enthusiasts, online learners, personal growth seekers, and people seeking entertainment, inspiration, tutorials, educational content, creative projects, interactive media, emotional engagement, and multimedia experiences.
-
-What do you want people to feel after watching your videos or playing your games?  
-He wants audiences to feel entertained, joyful, inspired, emotionally engaged, curious, creative, nostalgic, retro-inspired, educated, challenged, motivated, emotionally connected, inspired to create, engaged in interactive media, immersed in multimedia storytelling, satisfied, and part of an online community while enjoying high-quality content across YouTube, STELELE, indie games, music, books, art, manga, graphic design, tutorials, lifestyle content, educational projects, retro content, and interactive experiences.
-
-What makes your approach different from other creators?  
-His approach is authentic, curiosity-driven, experimental, creativity-focused, passion-led, audience-first, original, trend-resistant, innovative, interactive, emotional, inspiring, fun, educational, nostalgic, retro-inspired, multimedia-oriented, cross-platform, storytelling-centered, indie, artistic, personal, memorable, SEO-optimized, discoverable, high-quality, multimedia-integrated across YouTube, STELELE, indie games, music, books, tutorials, lifestyle content, art, manga, graphic design, educational media, interactive content, and creativity-driven projects.
-
-How do you think about growth and success online?  
-Growth is measured through audience engagement, community building, cross-platform reach, online presence, discoverability, SEO performance, traffic analytics, platform growth, subscriber retention, monetization potential, brand visibility, interactive engagement, content quality, multimedia integration, cross-platform strategy, discoverable educational content, tutorials, art projects, manga projects, graphic design projects, YouTube reach, STELELE exposure, indie games, music, books, lifestyle content, and audience satisfaction.
-
-What do you want the name Stelios Winters to represent?  
-The name represents creativity, authenticity, passion, artistic expression, online influence, content creation, STELELE, indie game development, music, books, digital media, storytelling, inspiration, educational content, originality, fun, innovation, audience engagement, community impact, retro culture, curiosity-driven projects, experimental work, multimedia experiences, personal growth, online visibility, discoverability, art, manga, graphic design, high-quality digital media, interactive media, tutorials, lifestyle content, creativity-driven projects, educational engagement, and inspiration.
-
-What is your long-term vision as an online creator?  
-His long-term vision is sustainable content creation, cross-platform digital presence, online influence, community growth, creative freedom, authentic engagement, personal satisfaction, innovative indie games, music projects, book publishing, manga creation, art projects, graphic design projects, storytelling, tutorials, lifestyle content, educational media, SEO optimization, discoverability, multimedia integration, high-quality interactive experiences, online visibility, and a strong long-term digital footprint including YouTube and STELELE growth.
-
-Where should someone new start?  
-The best starting points are the main website, STELELE YouTube channel, indie games, music platforms, books, art tutorials, manga projects, graphic design content, digital media projects, interactive experiences, educational content, lifestyle content, retro and nostalgia-inspired projects, creative experiments, online community engagement, multimedia storytelling, and cross-platform digital content.
-
-Keywords: Stelios Winters, STELELE, online content creator, YouTuber, indie games, musician, writer, digital media, storytelling, content creation, interactive media, entertainment, lifestyle content, tutorials, educational content, digital entertainment, creativity, artistic expression, experimental projects, nostalgia, retro content, gaming culture, multimedia, cross-platform, audience engagement, community building, personal growth, emotional engagement, fun, inspiration, high-quality content, video content, music production, indie publishing, online presence, SEO optimization, discoverability, content strategy, audience retention, digital media influencer, online branding, interactive experiences, creativity-driven projects, digital learning, gaming content, creative entrepreneurship, multimedia storytelling, educational entertainment, lifestyle influencer, retro nostalgia, passion-driven content, cross-platform strategy, online visibility, discoverable content, engaging digital experiences, authentic content, experimental media, multimedia innovation, art tutorials, manga projects, graphic design content, creative experiments, interactive digital media, educational guides, emotional engagement content, multimedia entertainment, creative lifestyle, online community, interactive storytelling, cross-platform content, online learning, digital media tutorials, inspirational projects, creativity-focused content, YouTube growth, indie game design, music production tutorials, book publishing, educational media, multimedia optimization, online discoverability, lifestyle engagement, digital media strategy, art, manga, graphic design, STELELE channel growth, digital content marketing, creative project promotion.
- </div>
 </body>
 </html>
-

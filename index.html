@@ -217,7 +217,7 @@
       display: inline-block;
       user-select: none;
     }
-    .thumb .desc {
+    .thumb .desc, .photo .desc {
       display: none;
       position: absolute;
       top: 0;
@@ -234,7 +234,7 @@
       text-align: center;
       user-select: none;
     }
-    .thumb:hover .desc { display: flex; }
+    .thumb:hover .desc, .photo:hover .desc { display: flex; }
     .contact-form {
       margin-top: 40px;
       width: 50%;
@@ -313,6 +313,10 @@
       cursor: pointer;
       z-index: 410;
       user-select: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      line-height: 1;
     }
     .category-title {
       font-size: 1.4em;
@@ -417,34 +421,36 @@
   
   <button id="backToTop" onclick="scrollToTop()"><span class="arrow-up">➜</span></button>
   
-  <div id="photoModal" onclick="if(event.target === this){ closeModal(); }">
-    <span class="close" onclick="closeModal(); event.stopPropagation();">&times;</span>
-    <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="" alt="Full Size" class="lazy">
+  <div id="photoModal" role="dialog" aria-modal="true" aria-label="Artwork viewer" onclick="if(event.target === this){ closeModal(); }">
+    <button type="button" class="close" aria-label="Close image viewer" onclick="closeModal(); event.stopPropagation();">&times;</button>
+    <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Full-size artwork">
   </div>
   
   <script>
     let homeMode = "latest";
+    let currentCategory = "home";
+    let imageObserver = null;
+    let lastFocusedElement = null;
 
     const homePageIndex = {};
+    const homeItemOrder = {};
 
     function renderHomeCategory(key) {
       const container = document.getElementById("home-grid-" + key);
       if (!container) return;
 
       const items = categoryData[key];
-      if (!homePageIndex[key]) homePageIndex[key] = 0;
+      if (!Array.isArray(items)) return;
+      if (homePageIndex[key] == null) homePageIndex[key] = 0;
 
-      let base = items.slice();
-      if (homeMode === "latest") base = base.slice().reverse();
-      if (homeMode === "random") base = getRandomItems(base, base.length);
-
+      const base = getHomeOrderedItems(key);
       const start = homePageIndex[key] * 3;
       const slice = base.slice(start, start + 3);
 
       container.innerHTML = "";
       slice.forEach(item => {
         container.innerHTML += `
-          <a href="${item.link}" target="_blank" class="thumb slide">
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="thumb slide">
             <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
                  data-src="${item.img}" class="lazy">
             <span class="desc">${item.desc || ""}</span>
@@ -489,19 +495,58 @@
       }
       return result;
     }
+
+    function getHomeOrderedItems(key) {
+      const source = Array.isArray(categoryData[key]) ? categoryData[key] : [];
+      const cached = homeItemOrder[key];
+      if (cached && cached.mode === homeMode && cached.source === source) {
+        return cached.items;
+      }
+
+      let items = source.slice();
+      if (homeMode === "latest") items.reverse();
+      if (homeMode === "random") items = getRandomItems(items, items.length);
+
+      homeItemOrder[key] = { mode: homeMode, source, items };
+      return items;
+    }
     
+    function loadLazyImage(img) {
+      const src = img.dataset.src;
+      if (!src) {
+        img.classList.add("loaded");
+        return;
+      }
+
+      img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
+      img.addEventListener("error", () => {
+        img.classList.add("loaded", "load-error");
+      }, { once: true });
+      img.src = src;
+      img.removeAttribute("data-src");
+    }
+
     function lazyLoadImages() {
       const lazyImages = document.querySelectorAll("img.lazy:not(.loaded)");
-      const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            img.src = img.dataset.src;
-            img.classList.add("loaded");
-            observer.unobserve(img);
-          }
-        });
-      });
+      if (!lazyImages.length) return;
+
+      // Graceful fallback for browsers without IntersectionObserver.
+      if (!("IntersectionObserver" in window)) {
+        lazyImages.forEach(loadLazyImage);
+        return;
+      }
+
+      // Reuse a single observer instead of creating one every time content changes.
+      if (!imageObserver) {
+        imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            loadLazyImage(entry.target);
+            observer.unobserve(entry.target);
+          });
+        }, { rootMargin: "200px 0px" });
+      }
+
       lazyImages.forEach(img => imageObserver.observe(img));
     }
     
@@ -675,18 +720,18 @@
         { img: "https://img.itch.zone/aW1nLzIyMjc2NzgucG5n/315x250%23c/yBf5ev.png", link: "https://stelioswinters.itch.io/cyclomadron", desc: "Amazing platformer with many different styles of gameplay" },
         { img: "https://img.itch.zone/aW1nLzIyMjc2ODAucG5n/315x250%23c/CAqP7V.png", link: "https://stelioswinters.itch.io/cyclomadron-carnage", desc: "The sequel is here with more challenges and this time you must kill everyone!" },
         { img: "https://img.itch.zone/aW1nLzE5MTMxNzU1LmpwZw==/315x250%23c/BA6YUy.jpg", link: "https://stelioswinters.itch.io/wolverun", desc: "Tigerians want to control the universe and mark it as their empire. Will Wolveruns stop their sinister plans?" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNDU5LmpwZw==/315x250%23c/aKCwyy.jpg", link: "https://stelioswinters.itch.io/energy-force", desc: "Bounce, bounce, bounce, bounce, bounce.." },
+        { img: "https://img.itch.zone/aW1nLzI5NzMwMDY2LmpwZw==/315x250%23c/8LP7KF.jpg", link: "https://stelioswinters.itch.io/energy-force", desc: "Bounce, bounce, bounce, bounce, bounce.." },
         { img: "https://img.itch.zone/aW1nLzIwMzgwNTMyLmpwZw==/315x250%23c/u1J9dg.jpg", link: "https://stelioswinters.itch.io/energy-force-omega", desc: "Barely bouncing anymore, so sad.. It's ok though, gravity is cool!" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwNzY2LmpwZw==/315x250%23c/1b%2FEIi.jpg", link: "https://stelioswinters.itch.io/energy-force-g", desc: "Omega is traveling the multiverse destroying everything on its path." },
+        { img: "https://img.itch.zone/aW1nLzI5NzMwMTUzLmpwZw==/315x250%23c/1YMfaX.jpg", link: "https://stelioswinters.itch.io/energy-force-g", desc: "Omega is traveling the multiverse destroying everything on its path." },
         { img: "https://img.itch.zone/aW1nLzIzMjg2NDIucG5n/315x250%23c/qoJy7q.png", link: "https://stelioswinters.itch.io/pneumachinic", desc: "Psychological horror/multiple-choice adventure game." },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNTA1LmpwZw==/315x250%23c/%2BJPsuD.jpg", link: "https://stelioswinters.itch.io/rampire", desc: "Build mazes and traps to slow down your enemies and kill them before they escape!" },
+        { img: "https://img.itch.zone/aW1nLzI5OTA3NjY0LnBuZw==/315x250%23c/5bVmDt.png", link: "https://stelioswinters.itch.io/rampire", desc: "Build mazes and traps to slow down your enemies and kill them before they escape!" },
         { img: "https://img.itch.zone/aW1nLzMwMjc3NjIucG5n/315x250%23c/FHlpRF.png", link: "https://stelioswinters.itch.io/catagolf", desc: "Golf with a catapult!" },
         { img: "https://img.itch.zone/aW1nLzI1MDI3ODkucG5n/315x250%23c/qNYr3M.png", link: "https://stelioswinters.itch.io/poolf", desc: "Pool minigolf!" },
         { img: "https://img.itch.zone/aW1nLzIwNDgyNTY4LmpwZw==/315x250%23c/DsRyq0.jpg", link: "https://stelioswinters.itch.io/hit-n-descent", desc: "Hit the ball with your mouse racket to pass the level!" },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNjIxLmpwZw==/315x250%23c/mu%2FgR0.jpg", link: "https://stelioswinters.itch.io/run-n-fight", desc: "Find your way through the mazes avoiding enemies until you find your weapon and take revenge." },
+        { img: "https://img.itch.zone/aW1nLzI5OTA3NjYxLnBuZw==/315x250%23c/VL%2BWmS.png", link: "https://stelioswinters.itch.io/run-n-fight", desc: "Find your way through the mazes avoiding enemies until you find your weapon and take revenge." },
         { img: "https://img.itch.zone/aW1nLzI5NjAzODAucG5n/315x250%23c/9TJ%2BkT.png", link: "https://stelioswinters.itch.io/cyborg-love", desc: "Mirror movement, puzzle platformer. Because cyborgs deserve love too!" },
-        { img: "https://img.itch.zone/aW1nLzIwMzgwMzMxLmpwZw==/315x250%23c/osmaU1.jpg", link: "https://stelioswinters.itch.io/cyborg-chrismas", desc: "Cyclomadron needs to collect all the ornaments for his metal Christmas tree while avoiding the coal!" },
-        { img: "https://img.itch.zone/aW1nLzIwNTcxMzY4LmpwZw==/315x250%23c/XPCZd9.jpg", link: "https://stelioswinters.itch.io/master-parker", desc: "Avoid cars and cones while trying to get your parking pass to unlock the parking and park your car" },
+        { img: "https://img.itch.zone/aW1nLzI5OTA3NjU1LnBuZw==/315x250%23c/Wms%2Bqg.png", link: "https://stelioswinters.itch.io/cyborg-chrismas", desc: "Cyclomadron needs to collect all the ornaments for his metal Christmas tree while avoiding the coal!" },
+        { img: "https://img.itch.zone/aW1nLzI5OTA3NjUyLnBuZw==/315x250%23c/leNcot.png", link: "https://stelioswinters.itch.io/master-parker", desc: "Avoid cars and cones while trying to get your parking pass to unlock the parking and park your car" },
         { img: "https://img.itch.zone/aW1nLzcyMzU3NzcucG5n/315x250%23c/H0LR0D.png", link: "https://stelioswinters.itch.io/stick-over-it", desc: "Stick Over It is a punishing climbing game with the purpose on reaching the top of the neon castle." },
         { img: "https://img.itch.zone/aW1nLzcyNTAxNjkucG5n/315x250%23c/PIuOo3.png", link: "https://stelioswinters.itch.io/bounce-over-it", desc: "Bounce Over It is a punishing climbing platformer game with the purpose on reaching the top of the neon castle." },
         { img: "https://img.itch.zone/aW1nLzI5NDk0MzkucG5n/315x250%23c/4gldnA.png", link: "https://stelioswinters.itch.io/magneblock", desc: "IQ based, brain puzzle solving video game​." },
@@ -696,7 +741,7 @@
         { img: "https://img.itch.zone/aW1nLzIxMzE0MTMucG5n/315x250%23c/r%2FU783.png", link: "https://stelioswinters.itch.io/shadowcut", desc: "Kill enemies and unlock new characters with different attacks!" },
         { img: "https://img.itch.zone/aW1nLzI0MDYzMDQucG5n/315x250%23c/t%2Ftdqd.png", link: "https://stelioswinters.itch.io/minimalisports", desc: "Multiplayer minimalistic fun!" },
         { img: "https://img.itch.zone/aW1nLzIwNzA5NjY5LmpwZw==/315x250%23c/jkCyUP.jpg", link: "https://stelioswinters.itch.io/fwoggy", desc: "Rage trying to push the yarn to the princess for a present" },
-        { img: "https://img.itch.zone/aW1nLzIwNDgyNjkzLmpwZw==/315x250%23c/56s0U6.jpg", link: "https://stelioswinters.itch.io/drift-of-death", desc: "A lone racer enters a brutal competition where every track is a battlefield." },
+        { img: "https://img.itch.zone/aW1nLzI5OTA3NjU0LnBuZw==/315x250%23c/moNoGB.png", link: "https://stelioswinters.itch.io/drift-of-death", desc: "A lone racer enters a brutal competition where every track is a battlefield." },
         { img: "https://img.itch.zone/aW1nLzIwOTc5ODg1LmpwZw==/315x250%23c/p5BUTf.jpg", link: "https://stelioswinters.itch.io/blockablock", desc: "Falling block matching endurance puzzle video game.​" },
         { img: "https://img.itch.zone/aW1nLzIxMDQ0Mzg0LmpwZw==/315x250%23c/fmPAUl.jpg", link: "https://stelioswinters.itch.io/wireblock", desc: "Falling block circuit-building puzzle video game.​" },
         { img: "https://img.itch.zone/aW1nLzIxMjcwMDQ4LmpwZw==/315x250%23c/cS27Oa.jpg", link: "https://stelioswinters.itch.io/cublock", desc: "Falling block square matching puzzle video game.​" }
@@ -726,6 +771,7 @@
     };
     
     function loadContent(cat, el) {
+      currentCategory = cat;
       let html = "";
       if (cat === "home") {
         html += `<h4 class="category-title">
@@ -737,15 +783,7 @@
                  </h4>`;
         homeOrder.forEach(key => {
           if (categoryData[key] && Array.isArray(categoryData[key])) {
-            let items = categoryData[key];
-            let selection = [];
-            if (homeMode === "latest") {
-              selection = items.slice(-3).reverse();
-            } else if (homeMode === "oldest") {
-              selection = items.slice(0, 3);
-            } else if (homeMode === "random") {
-              selection = getRandomItems(items, 3);
-            }
+            const selection = getHomeOrderedItems(key).slice(0, 3);
             if (selection.length) {
               html += `<div class="category-section">
                          <h5 class="category-name"><span id="arrow-left-${key}" onclick="homePrev('${key}')" style="cursor:pointer;margin-right:6px;">◀</span>
@@ -754,7 +792,7 @@
                          </h5>
                          <div class="grid home-grid" id="home-grid-${key}">`;
               selection.forEach(item => {
-                html += `<a href="${item.link}" target="_blank" class="thumb">
+                html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="thumb">
                            <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${getDisplayTitle(key)} thumbnail" class="lazy">
                            <span class="desc">${item.desc || ("Latest from " + getDisplayTitle(key))}</span>
                          </a>`;
@@ -779,9 +817,7 @@
           </div>`;
       } else if (cat === "about") {
         html = `<h4 class="category-title">About</h4>
-        <p><section class="about-stelios-winters">
-
-<section class="about-stelios-winters">
+        <section class="about-stelios-winters">
 
   <h3>Who is Stelios Winters?</h3>
   <p>
@@ -873,14 +909,16 @@
     This website is the best place to find everything I do in one spot, but especially the STELELE YouTube channel, where I’m making more personal on-camera content so people can get to know me better.
   </p>
 
-</section>
-</p>`;
+</section>`;
       } else if (cat === "art") {
         html += `<h4 class="category-title">Art</h4><div class="grid">`;
         categoryData[cat].slice().reverse().forEach(item => {
-          html += `<div class="photo" onclick="openModal('${item.img}')">
-                     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="Art" class="lazy">
-                     <span class="desc">${item.desc || 'Art image'}</span>
+          const artTitle = item.title || "Artwork";
+          html += `<div class="photo" role="button" tabindex="0" aria-label="View ${artTitle} full size"
+                         onclick="openModal('${item.img}', '${artTitle}')"
+                         onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openModal('${item.img}', '${artTitle}'); }">
+                     <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${artTitle}" class="lazy">
+                     <span class="desc">${artTitle}</span>
                    </div>`;
         });
         html += `</div>`;
@@ -889,7 +927,7 @@
         if (el.results && el.results.length) {
           html += `<div class="grid">`;
           el.results.forEach(item => {
-            html += `<a href="${item.link}" target="_blank" class="thumb">
+            html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="thumb">
                        <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${item.title} thumbnail" class="lazy">
                        <span class="desc">${item.desc || 'No description available.'}</span>
                      </a>`;
@@ -902,7 +940,7 @@
         let title = getDisplayTitle(cat);
         html += `<h4 class="category-title">${title}</h4><div class="grid">`;
         categoryData[cat].slice().reverse().forEach(item => {
-          html += `<a href="${item.link}" target="_blank" class="thumb">
+          html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="thumb">
                      <img src="data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="${item.img}" alt="${title} thumbnail" class="lazy">
                      <span class="desc">${item.desc || 'No description available'}</span>
                    </a>`;
@@ -931,16 +969,39 @@
       document.getElementById("sidebar").classList.toggle("open");
     }
     
-    function openModal(src) {
+    function openModal(src, title = "Artwork") {
       const modal = document.getElementById("photoModal");
-      modal.style.display = "flex";
       const modalImg = modal.querySelector("img");
-      modalImg.dataset.src = src;
-      lazyLoadImages();
+
+      lastFocusedElement = document.activeElement;
+      modalImg.alt = title ? `${title} (full size)` : "Full-size artwork";
+      modalImg.src = src; // Critical fix: always replace the image source on every opening.
+      modal.style.display = "flex";
+      document.body.style.overflow = "hidden";
+
+      const closeButton = modal.querySelector(".close");
+      if (closeButton) {
+        try { closeButton.focus({ preventScroll: true }); }
+        catch (_) { closeButton.focus(); }
+      }
     }
+
     function closeModal() {
-      document.getElementById("photoModal").style.display = "none";
+      const modal = document.getElementById("photoModal");
+      if (modal.style.display === "none") return;
+
+      modal.style.display = "none";
+      document.body.style.overflow = "";
+
+      if (lastFocusedElement && lastFocusedElement !== document.body && lastFocusedElement.isConnected) {
+        try { lastFocusedElement.focus({ preventScroll: true }); }
+        catch (_) { lastFocusedElement.focus(); }
+      }
     }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeModal();
+    });
     
     function doSearch() {
       let query = document.getElementById("searchInput").value.trim();
@@ -968,6 +1029,7 @@
     
     function setHomeMode(mode) {
       homeMode = mode;
+      Object.keys(homePageIndex).forEach(key => { homePageIndex[key] = 0; });
       loadContent("home", document.getElementById("home-link"));
     }
     
@@ -994,12 +1056,18 @@
       );
       Promise.all(promises).then(results => {
         categoryData.youtube = results;
-        const activeLink = document.querySelector(".sidebar a.active");
-        if (activeLink && activeLink.textContent.trim().toLowerCase() === "youtube") {
-          loadContent("youtube", activeLink);
-        } else {
+        homePageIndex.youtube = 0;
+        delete homeItemOrder.youtube;
+
+        if (currentCategory === "youtube") {
+          const youtubeLink = Array.from(document.querySelectorAll(".sidebar a"))
+            .find(link => link.textContent.trim().toLowerCase() === "youtube");
+          loadContent("youtube", youtubeLink || null);
+        } else if (currentCategory === "home") {
           loadContent("home", document.getElementById("home-link"));
         }
+      }).catch(error => {
+        console.error("Unable to load YouTube titles:", error);
       });
     }
     
